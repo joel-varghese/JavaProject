@@ -1,49 +1,36 @@
-import java.util.HashMap;
-import java.util.Map;
-// import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 
 public class App {
-
+    
+    private static ArrayList<ArrayList<String>> assemblerData = new ArrayList<ArrayList<String>>();
     private static Map<String, String> map = new HashMap<>();
     private static String locationTracker = "";
     public static void main(String[] args) {
-        // Scanner scanner = new Scanner(System.in);
-        // System.out.println("Enter a string:");
-        // String input = scanner.nextLine();
-        // scanner.close();
 
+        fetchOpcodes();
+        ArrayList<String> memoryLocation = new ArrayList<String>();
+        ArrayList<String> octalInstructions = new ArrayList<String>();
+        ArrayList<String> instructions = fetchInstructions("src/input/input1.txt");
 
-        // Display the entered string
-        // System.out.println("The binary is: " + decimalToBinary(input));
+        assemblerData.add(0, memoryLocation);
+        assemblerData.add(octalInstructions);
+        assemblerData.add(instructions);
 
-
-        initOpcodes();
-        String instructions[] = fetchInstructions();
-
-        String[] answers = new String[2];
-      
-        String trimmedInput = instructions[0].trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
-        // Regular expression pattern to extract opcode and numbers
-        Pattern pattern = Pattern.compile("([A-Za-z]+)\\s*(\\d+)(?:,(\\d+))?(?:,(\\d+))?(?:,(\\d+))?");
-        Matcher matcher = pattern.matcher(trimmedInput);
-        String index = "0";
-        if(matcher.find()){
-            index = matcher.group(2);
+        for(int i=0;i<instructions.size();i++){
+            // System.out.println("1. " + instructions.get(i));
+            extractOpcodeAndNumbers(instructions.get(i));
+            System.out.println(assemblerData.get(0).get(i) + "\t\t" + assemblerData.get(1).get(i) + "\t" + instructions.get(i));
         }
-        int decimalInd = Integer.parseInt(index);
-        String serial = "000000";
-      
-        for(int i=0;i<instructions.length;i++){
-          
-//             String opcode = extractOpcodeAndNumbers(vals[i]);
-//             String ans = "";
-//             if(i==0){ans = serial+"   "+opcode;}else{ans = integerToOctal(decimalInd, 6) +"   "+opcode;decimalInd++;}
-//             System.out.println(ans);
-               answers = extractOpcodeAndNumbers(instructions[i]);
-               System.out.println(answers[0] + "\t\t" + answers[1] + "\t" + instructions[i]);
-        }
+
+        outputFiles();
     }
 
     public static String decimalToBinary(String decimalStr) {
@@ -100,12 +87,12 @@ public class App {
         return Integer.toString(number);
     }
     
-    private static String[] extractOpcodeAndNumbers(String input) {
+    private static void extractOpcodeAndNumbers(String input) {
 
-            String trimmedInput = input.trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
+            // String trimmedInput = input.trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
             // Regular expression pattern to extract opcode and numbers
             Pattern pattern = Pattern.compile("([A-Za-z]+)\\s*(\\d+)(?:,(\\d+))?(?:,(\\d+))?(?:,(\\d+))?");
-            Matcher matcher = pattern.matcher(trimmedInput);
+            Matcher matcher = pattern.matcher(input);
             String location = "";
             String result = "";
 
@@ -191,28 +178,26 @@ public class App {
                     location = getLocation(locationTracker, true);
                 }
 
-
-                // Extracted numbers
-                // for (int i = 2; i <= matcher.groupCount(); i++) {
-                //     //  System.out.print(" Number " + (i - 1) + ": " + matcher.group(i));
-                // }
             } else {
                 // System.out.println(trimmedInput);
-                if(trimmedInput.equals("Data End")){
+                if(input.equals("Data End")){
                      result = "002000";
                     location = getLocation(locationTracker, true);
 
-                }else if(trimmedInput.equals("End: HLT")){
-                    result = "";
-
+                }else if(input.equals("End: HLT")){
+                    result = "000000";
                     location = getLocation("1024", true);
                 }
             }
 
-            // return answer;
-            String[] answers = {location, result};
+            ArrayList<String> memoryLocation = assemblerData.get(0);
+            ArrayList<String> octalInstruction = assemblerData.get(1);
 
-            return answers;
+            memoryLocation.add(location);
+            octalInstruction.add(result);
+            // assemblerHashtable.put("octal_instruction", result);
+            // assemblerHashtable.put("memory_location", location);
+            return;
     }
 
     public static String getLocation(String newLocation, boolean increment) {
@@ -231,90 +216,111 @@ public class App {
     }
 
 
-    public static void initOpcodes() {
+    public static void fetchOpcodes() {
+        // ArrayList<String> opcodes = new ArrayList<String>();
+        String filename = "src/input/opcodes.txt";
+        BufferedReader reader = null;
 
-      map.put("LDX","04");
-      map.put("LDR", "01");
-      map.put("STR", "02");
-      map.put("LDA", "03");
-      map.put("STX", "05");
-      map.put("JZ", "06");
-      map.put("JNE", "07");
-      map.put("JCC", "10");
-      map.put("JMA", "11");
-      map.put("JSR", "12");
-      map.put("RFS", "13");
-      map.put("SOB", "14");
-      map.put("JGE", "15");
-      map.put("AMR", "16");
-      map.put("SMR", "17");
-      map.put("AIR", "20");
-      map.put("SIR", "21");
-      map.put("MLT", "22");
-      map.put("DVD", "23");
-      map.put("TRR", "24");
-      map.put("AND", "25");
-      map.put("ORR", "26");
-      map.put("NOT", "27");
-      map.put("SETCCE", "44");
-      map.put("TRAP", "045");
-      map.put("Data","0");
-      map.put("LOC","0");
-      map.put("HLT","-1");
+        try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = reader.readLine();
+            String trimmedLine;
+
+			while (line != null) {
+				// System.out.println(line);
+                trimmedLine = line.trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
+                String[] codes = trimmedLine.split(",");
+                map.put(codes[0], codes[1]);
+				line = reader.readLine();
+			}
+
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}        
 
 	}
 	  
-    public static String[] fetchInstructions() {
-      String[] myInstructions = 
-              {
-                  "          LOC     6           ;BEGIN AT LOCATION 6",
-                  "          Data    10          ;PUT 10 AT LOCATION 6",
-                  "          Data    3           ;PUT 3 AT LOCATION 7",
-                  "          Data    End         ;PUT 1024 AT LOCATION 8",
-                  "          Data    0",
-                  "          Data    12",
-                  "          Data    9",
-                  "          Data    18",
-                  "          Data    12",
-                  "          LDX     2,7         ;X2 GETS 3",
-                  "          LDR     3,0,10      ;R3 GETS 12",
-                  "          LDR     2,2,10      ;R2 GETS 12",
-                  "          LDR     1,2,10,1    ;R1 GETS 18",
-                  "          LDA     0,0,0       ;R0 GETS 0 to set CONDITION CODE",
-                  "          LDX     1,8         ;X1 GETS 1024",
-                  "          SETCCE  0           ;SET CONDITION CODE FOR EQUAL",
-                  "          JZ      1,0         ;JUMP TO End if CC is 1",
-                  "          LOC     1024",
-                  "End:      HLT                 ;STOP"
+    public static ArrayList<String> fetchInstructions(String filename) {
 
-           };
+        ArrayList<String> myInstructions = new ArrayList<String>();
+        BufferedReader reader;
+        String trimmedInput;
 
-           String[] myInstructions2 = 
-           {"          LOC     6           ;BEGIN AT LOCATION 6",
-           "          Data    10          ;PUT 10 AT LOCATION 6",
-           "          Data    3           ;PUT 3 AT LOCATION 7",
-           "          Data    End         ;PUT 1024 AT LOCATION 8",
-           "          Data    0",
-           "          Data    12",
-           "          Data    9",
-           "          Data    18",
-           "          Data    12",
-           "          LDX     2,7         ;X2 GETS 3",
-           "          LDR     3,0,10      ;R3 GETS 12",
-           "          LDR     2,2,10      ;R2 GETS 12",
-           "          LDR     1,2,10,1    ;R1 GETS 18",
-           "          LDA     0,0,0       ;R0 GETS 0 to set CONDITION CODE",
-           "          LDX     1,8         ;X1 GETS 1024",
-           "          DVD     2,1         ;",
-           "          TRR     3,0         ;",
-           "          JSR     2,9,1       ;",
-           "          SETCCE  0           ;SET CONDITION CODE FOR EQUAL",
-           "          JZ      1,0         ;JUMP TO End if CC is 1",
-           "          LOC     1024",
-           "End:      HLT                 ;STOP"
-           };
+        try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = reader.readLine();
+
+			while (line != null) {
+				// System.out.println(line);
+				// read next line
+                trimmedInput = line.trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
+                myInstructions.add(trimmedInput);
+				line = reader.readLine();
+			}
+
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 
 		return myInstructions;
 	}	
+
+    public static void outputFiles() {
+        String path = "src/output/";
+        String filePath1 = path + "load_file.txt";
+        String filePath2 = path + "listing_file.txt";
+
+        BufferedWriter writer1 = null;
+        BufferedWriter writer2 = null;
+
+        try {
+
+            File file1 = new File(filePath1);
+            File file2 = new File(filePath2);
+       
+            /* This logic will make sure that the file 
+             * gets created if it is not present at the
+             * specified location*/
+            
+            FileWriter fw1 = new FileWriter(file1);
+            FileWriter fw2 = new FileWriter(file2);
+            writer1 = new BufferedWriter(fw1);
+            writer2 = new BufferedWriter(fw2);
+            
+            ArrayList<String> memoryLocation = assemblerData.get(0);
+            ArrayList<String> octalInstructions = assemblerData.get(1);
+            ArrayList<String> instructions = assemblerData.get(2);
+
+            for (int i = 0; i < instructions.size(); i++) {
+                if (memoryLocation.get(i) != "" && octalInstructions.get(i) != "" ) {
+                    writer1.write(memoryLocation.get(i) + "\t\t\t" + octalInstructions.get(i) + "\n");
+                    writer2.write(memoryLocation.get(i) + "\t\t" + octalInstructions.get(i) + "\t\t" + instructions.get(i) + "\n");
+                } else {
+                    writer2.write(memoryLocation.get(i) + "\t\t\t" + octalInstructions.get(i) + "\t\t\t" + instructions.get(i) + "\n");
+                }
+            }
+
+            System.out.println("File written Successfully");
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            try {
+                if(writer1 != null) {
+                    writer1.close();
+                }
+
+                if(writer2 != null) {
+                    writer2.close();
+                }
+ 
+            }catch(Exception ex){
+                System.out.println("Error in closing the BufferedWriter"+ex);
+            }
+        }
+    }
 
 }
