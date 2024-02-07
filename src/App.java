@@ -122,8 +122,8 @@ public class App {
                     binary2 = "00";
                     String ix = "";
                     binary3 = "00";
-                    String addr = decimalToBinary(matcher.group(2));
-                    binary5 = padBinary(addr, 5);
+                    String data = decimalToBinary(matcher.group(2));
+                    binary5 = padBinary(data, 5);
                     binary4 = "0";
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
                 }else if(opcode.equals("SETCCE")){
@@ -136,12 +136,12 @@ public class App {
                     binary4 = "0";
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
                 }else if(opcode.equals("LOC")){
-                    result = "000000";
+                    result = "";
                 }
                 if(result.length() > 0){
                     result = binaryToOctal(result);
                     result = padBinary(result, 6);
-                }
+                } 
 
                 if (opcode.equals("LOC")) {
                     locationTracker = matcher.group(2);
@@ -161,11 +161,23 @@ public class App {
                 // System.out.println(trimmedInput);
                 if(trimmedInput.equals("Data End")){
                      result = "002000";
+
+                     location = decimalToBinary(locationTracker);
+                     location = binaryToOctal(location);
+                     location = padBinary(location, 6);
+                     locationTracker = addDecimals(locationTracker, 1);
+
                 }else if(trimmedInput.equals("End: HLT")){
-                    result = "000000";
+                    result = "";
+
+                    locationTracker = "1024";
+                    location = decimalToBinary(locationTracker);
+                    location = binaryToOctal(location);
+                    location = padBinary(location, 6);
+                    locationTracker = addDecimals(locationTracker, 1);
                 }
             }
-            System.out.println(location + "\t\t" + result + input);
+            System.out.println(location + "\t\t" + result + "\t" + input);
     }
 
 
