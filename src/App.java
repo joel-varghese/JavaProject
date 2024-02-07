@@ -1,48 +1,26 @@
-import java.util.HashMap;
-import java.util.Map;
-// import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class App {
 
     private static Map<String, String> map = new HashMap<>();
     private static String locationTracker = "";
+    private static Hashtable<String, String> assemblerHashtable = new Hashtable<String, String>();
     public static void main(String[] args) {
-        // Scanner scanner = new Scanner(System.in);
-        // System.out.println("Enter a string:");
-        // String input = scanner.nextLine();
-        // scanner.close();
-
-
-        // Display the entered string
-        // System.out.println("The binary is: " + decimalToBinary(input));
 
 
         initOpcodes();
-        String instructions[] = fetchInstructions();
+        ArrayList<String> instructions = fetchInstructions("src/input/input1.txt");
+        
 
-        String[] answers = new String[2];
-      
-        String trimmedInput = instructions[0].trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
-        // Regular expression pattern to extract opcode and numbers
-        Pattern pattern = Pattern.compile("([A-Za-z]+)\\s*(\\d+)(?:,(\\d+))?(?:,(\\d+))?(?:,(\\d+))?");
-        Matcher matcher = pattern.matcher(trimmedInput);
-        String index = "0";
-        if(matcher.find()){
-            index = matcher.group(2);
-        }
-        int decimalInd = Integer.parseInt(index);
-        String serial = "000000";
-      
-        for(int i=0;i<instructions.length;i++){
-          
-//             String opcode = extractOpcodeAndNumbers(vals[i]);
-//             String ans = "";
-//             if(i==0){ans = serial+"   "+opcode;}else{ans = integerToOctal(decimalInd, 6) +"   "+opcode;decimalInd++;}
-//             System.out.println(ans);
-               answers = extractOpcodeAndNumbers(instructions[i]);
-               System.out.println(answers[0] + "\t\t" + answers[1] + "\t" + instructions[i]);
+        for(int i=0;i<instructions.size();i++){
+            // System.out.println("1. " + instructions.get(i));
+            extractOpcodeAndNumbers(instructions.get(i));
+            System.out.println(assemblerHashtable.get("memory_location") + "\t\t" + assemblerHashtable.get("octal_instruction") + "\t" + instructions.get(i));
         }
     }
 
@@ -100,7 +78,7 @@ public class App {
         return Integer.toString(number);
     }
     
-    private static String[] extractOpcodeAndNumbers(String input) {
+    private static void extractOpcodeAndNumbers(String input) {
 
             String trimmedInput = input.trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
             // Regular expression pattern to extract opcode and numbers
@@ -191,11 +169,6 @@ public class App {
                     location = getLocation(locationTracker, true);
                 }
 
-
-                // Extracted numbers
-                // for (int i = 2; i <= matcher.groupCount(); i++) {
-                //     //  System.out.print(" Number " + (i - 1) + ": " + matcher.group(i));
-                // }
             } else {
                 // System.out.println(trimmedInput);
                 if(trimmedInput.equals("Data End")){
@@ -203,16 +176,14 @@ public class App {
                     location = getLocation(locationTracker, true);
 
                 }else if(trimmedInput.equals("End: HLT")){
-                    result = "";
-
+                    result = "000000";
                     location = getLocation("1024", true);
                 }
             }
 
-            // return answer;
-            String[] answers = {location, result};
-
-            return answers;
+            assemblerHashtable.put("octal_instruction", result);
+            assemblerHashtable.put("memory_location", location);
+            return;
     }
 
     public static String getLocation(String newLocation, boolean increment) {
@@ -264,55 +235,27 @@ public class App {
 
 	}
 	  
-    public static String[] fetchInstructions() {
-      String[] myInstructions = 
-              {
-                  "          LOC     6           ;BEGIN AT LOCATION 6",
-                  "          Data    10          ;PUT 10 AT LOCATION 6",
-                  "          Data    3           ;PUT 3 AT LOCATION 7",
-                  "          Data    End         ;PUT 1024 AT LOCATION 8",
-                  "          Data    0",
-                  "          Data    12",
-                  "          Data    9",
-                  "          Data    18",
-                  "          Data    12",
-                  "          LDX     2,7         ;X2 GETS 3",
-                  "          LDR     3,0,10      ;R3 GETS 12",
-                  "          LDR     2,2,10      ;R2 GETS 12",
-                  "          LDR     1,2,10,1    ;R1 GETS 18",
-                  "          LDA     0,0,0       ;R0 GETS 0 to set CONDITION CODE",
-                  "          LDX     1,8         ;X1 GETS 1024",
-                  "          SETCCE  0           ;SET CONDITION CODE FOR EQUAL",
-                  "          JZ      1,0         ;JUMP TO End if CC is 1",
-                  "          LOC     1024",
-                  "End:      HLT                 ;STOP"
+    public static ArrayList<String> fetchInstructions(String filename) {
 
-           };
+        ArrayList<String> myInstructions = new ArrayList<String>();
+        BufferedReader reader;
 
-           String[] myInstructions2 = 
-           {"          LOC     6           ;BEGIN AT LOCATION 6",
-           "          Data    10          ;PUT 10 AT LOCATION 6",
-           "          Data    3           ;PUT 3 AT LOCATION 7",
-           "          Data    End         ;PUT 1024 AT LOCATION 8",
-           "          Data    0",
-           "          Data    12",
-           "          Data    9",
-           "          Data    18",
-           "          Data    12",
-           "          LDX     2,7         ;X2 GETS 3",
-           "          LDR     3,0,10      ;R3 GETS 12",
-           "          LDR     2,2,10      ;R2 GETS 12",
-           "          LDR     1,2,10,1    ;R1 GETS 18",
-           "          LDA     0,0,0       ;R0 GETS 0 to set CONDITION CODE",
-           "          LDX     1,8         ;X1 GETS 1024",
-           "          DVD     2,1         ;",
-           "          TRR     3,0         ;",
-           "          JSR     2,9,1       ;",
-           "          SETCCE  0           ;SET CONDITION CODE FOR EQUAL",
-           "          JZ      1,0         ;JUMP TO End if CC is 1",
-           "          LOC     1024",
-           "End:      HLT                 ;STOP"
-           };
+        try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = reader.readLine();
+
+			while (line != null) {
+				// System.out.println(line);
+				// read next line
+                myInstructions.add(line);
+				line = reader.readLine();
+			}
+
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 
 		return myInstructions;
 	}	
