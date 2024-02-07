@@ -4,24 +4,34 @@ import java.util.regex.Pattern;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 
 public class App {
 
     private static Map<String, String> map = new HashMap<>();
     private static String locationTracker = "";
-    private static Hashtable<String, String> assemblerHashtable = new Hashtable<String, String>();
+    // private static Hashtable<String, ArrayList<String>> assemblerHashtable = new Hashtable<String, ArrayList<String>>();
+    private static ArrayList<ArrayList<String>> assemblerData = new ArrayList<ArrayList<String>>();
     public static void main(String[] args) {
 
-
         initOpcodes();
+        ArrayList<String> memoryLocation = new ArrayList<String>();
+        ArrayList<String> octalInstructions = new ArrayList<String>();
         ArrayList<String> instructions = fetchInstructions("src/input/input1.txt");
-        
+
+        assemblerData.add(0, memoryLocation);
+        assemblerData.add(octalInstructions);
+        assemblerData.add(instructions);
 
         for(int i=0;i<instructions.size();i++){
             // System.out.println("1. " + instructions.get(i));
             extractOpcodeAndNumbers(instructions.get(i));
-            System.out.println(assemblerHashtable.get("memory_location") + "\t\t" + assemblerHashtable.get("octal_instruction") + "\t" + instructions.get(i));
+            System.out.println(assemblerData.get(0).get(i) + "\t\t" + assemblerData.get(1).get(i) + "\t" + instructions.get(i));
         }
+
+        outputFiles();
     }
 
     public static String decimalToBinary(String decimalStr) {
@@ -181,8 +191,13 @@ public class App {
                 }
             }
 
-            assemblerHashtable.put("octal_instruction", result);
-            assemblerHashtable.put("memory_location", location);
+            ArrayList<String> memoryLocation = assemblerData.get(0);
+            ArrayList<String> octalInstruction = assemblerData.get(1);
+
+            memoryLocation.add(location);
+            octalInstruction.add(result);
+            // assemblerHashtable.put("octal_instruction", result);
+            // assemblerHashtable.put("memory_location", location);
             return;
     }
 
@@ -259,5 +274,60 @@ public class App {
 
 		return myInstructions;
 	}	
+
+    public static void outputFiles() {
+        String path = "src/output/";
+        String filePath1 = path + "load_file.txt";
+        String filePath2 = path + "listing_file.txt";
+
+        BufferedWriter writer1 = null;
+        BufferedWriter writer2 = null;
+
+        try {
+
+            File file1 = new File(filePath1);
+            File file2 = new File(filePath2);
+       
+            /* This logic will make sure that the file 
+             * gets created if it is not present at the
+             * specified location*/
+            
+            FileWriter fw1 = new FileWriter(file1);
+            FileWriter fw2 = new FileWriter(file2);
+            writer1 = new BufferedWriter(fw1);
+            writer2 = new BufferedWriter(fw2);
+            
+            ArrayList<String> memoryLocation = assemblerData.get(0);
+            ArrayList<String> octalInstructions = assemblerData.get(1);
+            ArrayList<String> instructions = assemblerData.get(2);
+
+            for (int i = 0; i < instructions.size(); i++) {
+                if (memoryLocation.get(i) != "" && octalInstructions.get(i) != "" ) {
+                    writer1.write(memoryLocation.get(i) + "\t\t\t" + octalInstructions.get(i) + "\n");
+                    writer2.write(memoryLocation.get(i) + "\t\t" + octalInstructions.get(i) + "\t" + instructions.get(i) + "\n");
+                } else {
+                    writer2.write(memoryLocation.get(i) + "\t\t\t" + octalInstructions.get(i) + "\t\t" + instructions.get(i) + "\n");
+                }
+            }
+
+            System.out.println("File written Successfully");
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            try {
+                if(writer1 != null) {
+                    writer1.close();
+                }
+
+                if(writer2 != null) {
+                    writer2.close();
+                }
+ 
+            }catch(Exception ex){
+                System.out.println("Error in closing the BufferedWriter"+ex);
+            }
+        }
+    }
 
 }
