@@ -19,9 +19,10 @@ public class App {
         // System.out.println("The binary is: " + decimalToBinary(input));
 
 
+        initOpcodes();
         String vals[] = fetchInstructions();
+
         String[] answers = new String[2];
-        
       
         String trimmedInput = vals[0].trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
         // Regular expression pattern to extract opcode and numbers
@@ -188,10 +189,6 @@ public class App {
                     location = getLocation(matcher.group(2), false);
                     location = "";
                 } else {
-                    // location = decimalToBinary(locationTracker);
-                    // location = binaryToOctal(location);
-                    // location = padBinary(location, 6);
-                    // locationTracker = addDecimals(locationTracker, 1);
                     location = getLocation(locationTracker, true);
                 }
 
@@ -204,31 +201,18 @@ public class App {
                 // System.out.println(trimmedInput);
                 if(trimmedInput.equals("Data End")){
                      result = "002000";
-
-                    //  location = decimalToBinary(locationTracker);
-                    //  location = binaryToOctal(location);
-                    //  location = padBinary(location, 6);
-                    //  locationTracker = addDecimals(locationTracker, 1);
                     location = getLocation(locationTracker, true);
 
                 }else if(trimmedInput.equals("End: HLT")){
                     result = "";
 
-                    // locationTracker = "1024";
-                    // location = decimalToBinary(locationTracker);
-                    // location = binaryToOctal(location);
-                    // location = padBinary(location, 6);
-                    // locationTracker = addDecimals(locationTracker, 1);
                     location = getLocation("1024", true);
                 }
             }
 
-            
             // return answer;
             answers[0] = location;
             answers[1] = result;
-
-            System.out.println(location + "\t\t" + result + "\t" + input);
 
             return answers;
     }
