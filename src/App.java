@@ -20,11 +20,11 @@ public class App {
 
 
         initOpcodes();
-        String vals[] = fetchInstructions();
+        String instructions[] = fetchInstructions();
 
         String[] answers = new String[2];
       
-        String trimmedInput = vals[0].trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
+        String trimmedInput = instructions[0].trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
         // Regular expression pattern to extract opcode and numbers
         Pattern pattern = Pattern.compile("([A-Za-z]+)\\s*(\\d+)(?:,(\\d+))?(?:,(\\d+))?(?:,(\\d+))?");
         Matcher matcher = pattern.matcher(trimmedInput);
@@ -35,14 +35,14 @@ public class App {
         int decimalInd = Integer.parseInt(index);
         String serial = "000000";
       
-        for(int i=0;i<vals.length;i++){
+        for(int i=0;i<instructions.length;i++){
           
 //             String opcode = extractOpcodeAndNumbers(vals[i]);
 //             String ans = "";
 //             if(i==0){ans = serial+"   "+opcode;}else{ans = integerToOctal(decimalInd, 6) +"   "+opcode;decimalInd++;}
 //             System.out.println(ans);
-               answers = extractOpcodeAndNumbers(vals[i]);
-               System.out.println(answers[0] + "\t\t" + answers[1] + "\t" + vals[i]);
+               answers = extractOpcodeAndNumbers(instructions[i]);
+               System.out.println(answers[0] + "\t\t" + answers[1] + "\t" + instructions[i]);
         }
     }
 
@@ -108,7 +108,6 @@ public class App {
             Matcher matcher = pattern.matcher(trimmedInput);
             String location = "";
             String result = "";
-            String[] answers = new String[2];
 
             if (matcher.find()) {
                 // Extracted opcode
@@ -211,8 +210,7 @@ public class App {
             }
 
             // return answer;
-            answers[0] = location;
-            answers[1] = result;
+            String[] answers = {location, result};
 
             return answers;
     }
