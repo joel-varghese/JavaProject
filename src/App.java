@@ -14,62 +14,17 @@ public class App {
         // String input = scanner.nextLine();
         // scanner.close();
 
-        map.put("LDX","04");
-        map.put("LDR", "01");
-        map.put("LDA", "03");
-        map.put("STX", "05");
-        map.put("JZ", "06");
-        map.put("JNE", "07");
-        map.put("JCC", "10");
-        map.put("JMA", "11");
-        map.put("JSR", "12");
-        map.put("RFS", "13");
-        map.put("SOB", "14");
-        map.put("JGE", "15");
-        map.put("AMR", "16");
-        map.put("SMR", "17");
-        map.put("AIR", "20");
-        map.put("SIR", "21");
-        map.put("MLT", "22");
-        map.put("DVD", "23");
-        map.put("TRR", "24");
-        map.put("AND", "25");
-        map.put("ORR", "26");
-        map.put("NOT", "27");
-        map.put("SETCCE", "44");
-        map.put("Data","0");
-        map.put("LOC","0");
-        map.put("HLT","-1");
 
         // Display the entered string
         // System.out.println("The binary is: " + decimalToBinary(input));
 
 
-        String vals[] = {"          LOC     6           ;BEGIN AT LOCATION 6",
-        "          Data    10          ;PUT 10 AT LOCATION 6",
-        "          Data    3           ;PUT 3 AT LOCATION 7",
-        "          Data    End         ;PUT 1024 AT LOCATION 8",
-        "          Data    0",
-        "          Data    12",
-        "          Data    9",
-        "          Data    18",
-        "          Data    12",
-        "          LDX     2,7         ;X2 GETS 3",
-        "          LDR     3,0,10      ;R3 GETS 12",
-        "          LDR     2,2,10      ;R2 GETS 12",
-        "          LDR     1,2,10,1    ;R1 GETS 18",
-        "          LDA     0,0,0       ;R0 GETS 0 to set CONDITION CODE",
-        "          LDX     1,8         ;X1 GETS 1024",
-        "          DVD     2,1         ;",
-        "          TRR     3,0         ;",
-        "          JSR     2,9,1       ;",
-        "          SETCCE  0           ;SET CONDITION CODE FOR EQUAL",
-        "          JZ      1,0         ;JUMP TO End if CC is 1",
-        "          LOC     1024",
-        "End:      HLT                 ;STOP"
-        };
+        initOpcodes();
+        String instructions[] = fetchInstructions();
+
+        String[] answers = new String[2];
       
-        String trimmedInput = vals[0].trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
+        String trimmedInput = instructions[0].trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
         // Regular expression pattern to extract opcode and numbers
         Pattern pattern = Pattern.compile("([A-Za-z]+)\\s*(\\d+)(?:,(\\d+))?(?:,(\\d+))?(?:,(\\d+))?");
         Matcher matcher = pattern.matcher(trimmedInput);
@@ -80,13 +35,14 @@ public class App {
         int decimalInd = Integer.parseInt(index);
         String serial = "000000";
       
-        for(int i=0;i<vals.length;i++){
+        for(int i=0;i<instructions.length;i++){
           
 //             String opcode = extractOpcodeAndNumbers(vals[i]);
 //             String ans = "";
 //             if(i==0){ans = serial+"   "+opcode;}else{ans = integerToOctal(decimalInd, 6) +"   "+opcode;decimalInd++;}
 //             System.out.println(ans);
-               extractOpcodeAndNumbers(vals[i]);
+               answers = extractOpcodeAndNumbers(instructions[i]);
+               System.out.println(answers[0] + "\t\t" + answers[1] + "\t" + instructions[i]);
         }
     }
 
@@ -144,7 +100,7 @@ public class App {
         return Integer.toString(number);
     }
     
-    private static void extractOpcodeAndNumbers(String input) {
+    private static String[] extractOpcodeAndNumbers(String input) {
 
             String trimmedInput = input.trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
             // Regular expression pattern to extract opcode and numbers
@@ -152,6 +108,7 @@ public class App {
             Matcher matcher = pattern.matcher(trimmedInput);
             String location = "";
             String result = "";
+
             if (matcher.find()) {
                 // Extracted opcode
                 String opcode = matcher.group(1);
@@ -227,12 +184,11 @@ public class App {
                 } 
 
                 if (opcode.equals("LOC")) {
-                    locationTracker = matcher.group(2);
+                    // locationTracker = matcher.group(2);
+                    location = getLocation(matcher.group(2), false);
+                    location = "";
                 } else {
-                    location = decimalToBinary(locationTracker);
-                    location = binaryToOctal(location);
-                    location = padBinary(location, 6);
-                    locationTracker = addDecimals(locationTracker, 1);
+                    location = getLocation(locationTracker, true);
                 }
 
 
@@ -244,56 +200,68 @@ public class App {
                 // System.out.println(trimmedInput);
                 if(trimmedInput.equals("Data End")){
                      result = "002000";
-
-                     location = decimalToBinary(locationTracker);
-                     location = binaryToOctal(location);
-                     location = padBinary(location, 6);
-                     locationTracker = addDecimals(locationTracker, 1);
+                    location = getLocation(locationTracker, true);
 
                 }else if(trimmedInput.equals("End: HLT")){
                     result = "";
 
-                    locationTracker = "1024";
-                    location = decimalToBinary(locationTracker);
-                    location = binaryToOctal(location);
-                    location = padBinary(location, 6);
-                    locationTracker = addDecimals(locationTracker, 1);
+                    location = getLocation("1024", true);
                 }
             }
 
-            System.out.println(location + "\t\t" + result + "\t" + input);
             // return answer;
+            String[] answers = {location, result};
+
+            return answers;
+    }
+
+    public static String getLocation(String newLocation, boolean increment) {
+
+        locationTracker = newLocation;
+        String location;
+        location = decimalToBinary(locationTracker);
+        location = binaryToOctal(location);
+        location = padBinary(location, 6);
+
+        if (increment) {
+            locationTracker = addDecimals(locationTracker, 1);
+        }
+        
+        return location;
     }
 
 
     public static void initOpcodes() {
-      map.put("HLT", "-1");
-      map.put("DATA", "000");
-      map.put("LDR", "001");
-      map.put("STR", "002");
-      map.put("LDA", "003");
-      map.put("LDX", "004");
-      map.put("STX", "005");
-      map.put("JZ", "006");
-      map.put("JNE", "007");
-      map.put("JCC", "010");
-      map.put("JMA", "011");
-      map.put("JSR", "012");
-      map.put("RFS", "013");
-      map.put("SOB", "014");
-      map.put("JGE", "015");
-      map.put("AMR", "016");
-      map.put("SMR", "017");
-      map.put("AIR", "020");
-      map.put("SIR", "021");
-      map.put("MLT", "022");
-      map.put("DVD", "023");
-      map.put("TRR", "024");
-      map.put("AND", "025");
-      map.put("ORR", "026");
-      map.put("NOT", "027");
-      map.put("SETCCE", "044");
+
+      map.put("LDX","04");
+      map.put("LDR", "01");
+      map.put("STR", "02");
+      map.put("LDA", "03");
+      map.put("STX", "05");
+      map.put("JZ", "06");
+      map.put("JNE", "07");
+      map.put("JCC", "10");
+      map.put("JMA", "11");
+      map.put("JSR", "12");
+      map.put("RFS", "13");
+      map.put("SOB", "14");
+      map.put("JGE", "15");
+      map.put("AMR", "16");
+      map.put("SMR", "17");
+      map.put("AIR", "20");
+      map.put("SIR", "21");
+      map.put("MLT", "22");
+      map.put("DVD", "23");
+      map.put("TRR", "24");
+      map.put("AND", "25");
+      map.put("ORR", "26");
+      map.put("NOT", "27");
+      map.put("SETCCE", "44");
       map.put("TRAP", "045");
+      map.put("Data","0");
+      map.put("LOC","0");
+      map.put("HLT","-1");
+
 	}
 	  
     public static String[] fetchInstructions() {
@@ -320,6 +288,32 @@ public class App {
                   "End:      HLT                 ;STOP"
 
            };
+
+           String[] myInstructions2 = 
+           {"          LOC     6           ;BEGIN AT LOCATION 6",
+           "          Data    10          ;PUT 10 AT LOCATION 6",
+           "          Data    3           ;PUT 3 AT LOCATION 7",
+           "          Data    End         ;PUT 1024 AT LOCATION 8",
+           "          Data    0",
+           "          Data    12",
+           "          Data    9",
+           "          Data    18",
+           "          Data    12",
+           "          LDX     2,7         ;X2 GETS 3",
+           "          LDR     3,0,10      ;R3 GETS 12",
+           "          LDR     2,2,10      ;R2 GETS 12",
+           "          LDR     1,2,10,1    ;R1 GETS 18",
+           "          LDA     0,0,0       ;R0 GETS 0 to set CONDITION CODE",
+           "          LDX     1,8         ;X1 GETS 1024",
+           "          DVD     2,1         ;",
+           "          TRR     3,0         ;",
+           "          JSR     2,9,1       ;",
+           "          SETCCE  0           ;SET CONDITION CODE FOR EQUAL",
+           "          JZ      1,0         ;JUMP TO End if CC is 1",
+           "          LOC     1024",
+           "End:      HLT                 ;STOP"
+           };
+
 		return myInstructions;
 	}	
 
