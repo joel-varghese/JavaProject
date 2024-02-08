@@ -299,7 +299,7 @@ public class App {
                     writer1.write(memoryLocation.get(i) + "\t\t\t" + octalInstructions.get(i) + "\n");
                     writer2.write(memoryLocation.get(i) + "\t\t" + octalInstructions.get(i) + "\t\t" + instructions.get(i) + "\n");
                 } else {
-                    writer2.write(memoryLocation.get(i) + "\t\t\t" + octalInstructions.get(i) + "\t\t\t" + instructions.get(i) + "\n");
+                    writer2.write(memoryLocation.get(i) + "\t\t" + octalInstructions.get(i) + "\t\t" + instructions.get(i) + "\n");
                 }
             }
 
