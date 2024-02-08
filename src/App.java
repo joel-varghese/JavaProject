@@ -297,10 +297,9 @@ public class App {
             for (int i = 0; i < instructions.size(); i++) {
                 if (memoryLocation.get(i) != "" && octalInstructions.get(i) != "" ) {
                     writer1.write(memoryLocation.get(i) + "\t\t\t" + octalInstructions.get(i) + "\n");
-                    writer2.write(memoryLocation.get(i) + "\t\t" + octalInstructions.get(i) + "\t\t" + instructions.get(i) + "\n");
-                } else {
-                    writer2.write(memoryLocation.get(i) + "\t\t" + octalInstructions.get(i) + "\t\t" + instructions.get(i) + "\n");
-                }
+                } 
+                writer2.write(memoryLocation.get(i) + "\t\t" + octalInstructions.get(i) + "\t\t" + instructions.get(i) + "\n");
+                
             }
 
             System.out.println("File written Successfully");
