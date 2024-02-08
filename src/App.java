@@ -150,7 +150,7 @@ public class App {
                     String ix = "";
                     binary3 = "00";
                     String addr = "";
-                    binary5 = "00";
+                    binary5 = "00000";
                     binary4 = "0";
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
                 }else if(opcode.equals("MLT") || opcode.equals("DVD") || opcode.equals("TRR") || opcode.equals("AND") || opcode.equals("ORR")){
@@ -159,7 +159,7 @@ public class App {
                     String ix = decimalToBinary(matcher.group(3));
                     binary3 = padBinary(ix, 2);
                     String addr = "";
-                    binary5 = "00";
+                    binary5 = "00000";
                     binary4 = "0";
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
                 }else if(opcode.equals("LOC")){
