@@ -18,7 +18,7 @@ public class App {
         fetchOpcodes();
         ArrayList<String> memoryLocation = new ArrayList<String>();
         ArrayList<String> octalInstructions = new ArrayList<String>();
-        ArrayList<String> instructions = fetchInstructions("src/input/input1.txt");
+        ArrayList<String> instructions = fetchInstructions();
 
         assemblerData.add(0, memoryLocation);
         assemblerData.add(octalInstructions);
@@ -218,7 +218,8 @@ public class App {
 
     public static void fetchOpcodes() {
         // ArrayList<String> opcodes = new ArrayList<String>();
-        String filename = "src/input/opcodes.txt";
+        String filename = "./src/input/opcodes.txt";
+        
         BufferedReader reader = null;
 
         try {
@@ -241,8 +242,9 @@ public class App {
 
 	}
 	  
-    public static ArrayList<String> fetchInstructions(String filename) {
+    public static ArrayList<String> fetchInstructions() {
 
+        String filename = "./src/input/input1.txt";
         ArrayList<String> myInstructions = new ArrayList<String>();
         BufferedReader reader;
         String trimmedInput;
