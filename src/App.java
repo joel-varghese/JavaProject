@@ -17,10 +17,11 @@ public class App {
     // private static ArrayList<Integer> memoryAddress = new ArrayList<Integer>(2048);
     private static List<Integer> generalRegister = new ArrayList<Integer>(Collections.nCopies(4, 0)); // R0, R1, R2, R3. For use w LDR
     private static List<Integer> indexRegister = new ArrayList<Integer>(Collections.nCopies(3, 0)); // X1, X2, X3. For use w LDX
-    private static List<Integer> memoryAddress = new ArrayList<Integer>(Collections.nCopies(30, 0)); // 2048
+    private static List<Integer> memoryAddress = new ArrayList<Integer>(Collections.nCopies(2048, 0)); // 2048
 
     private static String locationTracker = "";
     public static void main(String[] args) {
+
 
         fetchOpcodes();
         ArrayList<String> memoryLocation = new ArrayList<String>();
@@ -132,10 +133,13 @@ public class App {
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
 
                     // address, index register, indirect bit
-                    EA = computeEA(matcher.group(4), matcher.group(3), binary4);
 
                     if (opcode.equals("LDR")){
                         LDR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                    } else if (opcode.equals("LDA")) {
+                        LDA(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                    } else if (opcode.equals("STR")) {
+                        STR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
                     }
 
                 }else if(opcode .equals("LDX") || opcode.equals("STX") || opcode.equals("JZ") || opcode.equals("JNE")|| opcode.equals("JMA")|| opcode.equals("JSR")){
@@ -155,6 +159,9 @@ public class App {
                     if (opcode.equals("LDX")) {
                         // LDX x, address [,I]
                         LDX(matcher.group(2), matcher.group(3), binary4);
+                    } else if (opcode.equals("STX")) {
+                        STX(matcher.group(2), matcher.group(3), binary4);
+                        System.out.println("IX: " + matcher.group(2) + " Addr: " + matcher.group(3) + "Indirect Bit: " + binary4);
                     }
 
                 }else if(opcode.equals("Data")){
@@ -272,6 +279,22 @@ public class App {
         // System.out.println();
     }
 
+
+    // R0, R1, R2, R3
+    public static void LDR(String register, String ix, String address, String indirectBit) {
+        int EA = computeEA(address, ix, indirectBit);
+        int R = Integer.parseInt(register);
+
+        generalRegister.set(R, memoryAddress.get(EA));
+
+        // System.out.println("General Register: ");
+        // for (int i = 0; i < generalRegister.size(); i++) {
+        //     System.out.print("R" + Integer.toString(i) + ": " + Integer.toString(generalRegister.get(i)) + "\t");
+        // }
+        // System.out.println();
+    }
+
+    // X1, X2, X3
     // LDX x, address [,I]
     public static void LDX (String ix, String address, String indirectBit) {
         int ixField = Integer.parseInt(ix) - 1;
@@ -281,24 +304,35 @@ public class App {
 
         // System.out.println("Index Register:");
         // for (int i = 0; i < indexRegister.size(); i++) {
-        //     System.out.print(Integer.toString(i + 1) + ": " + Integer.toString(indexRegister.get(i)) + "\t");
+        //     System.out.print("X" + Integer.toString(i + 1) + ": " + Integer.toString(indexRegister.get(i)) + "\t");
         // }
         // System.out.println();
     }
 
-    public static void LDR(String register, String ix, String address, String indirectBit) {
+    // R0, R1, R2, R3
+    public static void LDA(String register, String ix, String address, String indirectBit) {
         int EA = computeEA(address, ix, indirectBit);
         int R = Integer.parseInt(register);
 
-        generalRegister.set(R-1, memoryAddress.get(EA));
-
-        // System.out.println("General Register: ");
-        // for (int i = 0; i < generalRegister.size(); i++) {
-        //     System.out.print(Integer.toString(i+1) + ": " + Integer.toString(generalRegister.get(i)) + "\t");
-        // }
-        // System.out.println();
+        generalRegister.set(R, EA);
     }
-    
+
+    // R0, R1, R2, R3
+    public static void STR(String register, String ix, String address, String indirectBit) {
+        int EA = computeEA(address, ix, indirectBit);
+        int R = Integer.parseInt(register);
+
+        memoryAddress.set(EA, generalRegister.get(R));
+    }
+
+    // X1, X2, X3
+    public static void STX(String ix, String address, String indirectBit) {
+        int EA = computeEA(address, ix, indirectBit);
+
+        System.out.println("EA: " + Integer.toString(EA) + " - Value: " + indexRegister.get(Integer.parseInt(ix)-1));
+        
+        memoryAddress.set(EA, indexRegister.get(Integer.parseInt(ix)-1));
+    }
 
     public static String getLocation(String newLocation, boolean increment) {
 
