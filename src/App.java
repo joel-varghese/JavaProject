@@ -133,7 +133,10 @@ public class App {
 
                     // address, index register, indirect bit
                     EA = computeEA(matcher.group(4), matcher.group(3), binary4);
-                    System.out.println("Effective Address: " + Integer.toString(EA));
+
+                    if (opcode.equals("LDR")){
+                        LDR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                    }
 
                 }else if(opcode .equals("LDX") || opcode.equals("STX") || opcode.equals("JZ") || opcode.equals("JNE")|| opcode.equals("JMA")|| opcode.equals("JSR")){
                     String reg = "";
@@ -253,7 +256,20 @@ public class App {
             }
         }
 
+        System.out.println("Effective Address: " + Integer.toString(effectiveAddress));
+
+
         return effectiveAddress;
+    }
+    public static void DATA(String data) {
+        memoryAddress.set(Integer.parseInt(locationTracker), Integer.parseInt(data));
+
+        // System.out.println("Data Input: ");
+
+        // for (int i = 0; i < memoryAddress.size(); i++) {
+        //     System.out.print(Integer.toString(i) + ": " + Integer.toString(memoryAddress.get(i)) + "\t");
+        // }
+        // System.out.println();
     }
 
     // LDX x, address [,I]
@@ -269,17 +285,20 @@ public class App {
         // }
         // System.out.println();
     }
-    
-    public static void DATA(String data) {
-        memoryAddress.set(Integer.parseInt(locationTracker), Integer.parseInt(data));
 
-        // System.out.println("Data Input: ");
+    public static void LDR(String register, String ix, String address, String indirectBit) {
+        int EA = computeEA(address, ix, indirectBit);
+        int R = Integer.parseInt(register);
 
-        // for (int i = 0; i < memoryAddress.size(); i++) {
-        //     System.out.print(Integer.toString(i) + ": " + Integer.toString(memoryAddress.get(i)) + "\t");
+        generalRegister.set(R-1, memoryAddress.get(EA));
+
+        // System.out.println("General Register: ");
+        // for (int i = 0; i < generalRegister.size(); i++) {
+        //     System.out.print(Integer.toString(i+1) + ": " + Integer.toString(generalRegister.get(i)) + "\t");
         // }
         // System.out.println();
     }
+    
 
     public static String getLocation(String newLocation, boolean increment) {
 
@@ -382,7 +401,6 @@ public class App {
                     writer1.write(memoryLocation.get(i) + "\t\t\t" + octalInstructions.get(i) + "\n");
                 } 
                 writer2.write(memoryLocation.get(i) + "\t\t" + octalInstructions.get(i) + "\t\t" + instructions.get(i) + "\n");
-                
             }
 
             System.out.println("File written Successfully");
