@@ -12,6 +12,13 @@ public class App {
     
     private static ArrayList<ArrayList<String>> assemblerData = new ArrayList<ArrayList<String>>();
     private static Map<String, String> map = new HashMap<>();
+    // private static ArrayList<Integer> generalRegister = new ArrayList<Integer>(4); // R0, R1, R2, R3. For use w LDR
+    //private static ArrayList<Integer> indexRegister = new ArrayList<Integer>(3); // X1, X2, X3. For use w LDX
+    // private static ArrayList<Integer> memoryAddress = new ArrayList<Integer>(2048);
+    private static List<Integer> generalRegister = new ArrayList<Integer>(Collections.nCopies(4, 0)); // R0, R1, R2, R3. For use w LDR
+    private static List<Integer> indexRegister = new ArrayList<Integer>(Collections.nCopies(3, 0)); // X1, X2, X3. For use w LDX
+    private static List<Integer> memoryAddress = new ArrayList<Integer>(Collections.nCopies(30, 0)); // 2048
+
     private static String locationTracker = "";
     public static void main(String[] args) {
 
@@ -32,6 +39,7 @@ public class App {
 
         outputFiles();
     }
+
 
     public static String decimalToBinary(String decimalStr) {
         int number = Integer.parseInt(decimalStr);
@@ -105,6 +113,7 @@ public class App {
                 String binary3 = "";
                 String binary4 = "";
                 String binary5 = "";
+                int EA;
                 if(map.get(opcode) != null){binary1 = decimalToBinary(map.get(opcode));}
                 binary1 = padBinary(binary1, 6);
                 // System.out.print(binary1);
@@ -121,6 +130,11 @@ public class App {
                         binary4 = "0";
                     }
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
+
+                    // address, index register, indirect bit
+                    EA = computeEA(matcher.group(4), matcher.group(3), binary4);
+                    System.out.println("Effective Address: " + Integer.toString(EA));
+
                 }else if(opcode .equals("LDX") || opcode.equals("STX") || opcode.equals("JZ") || opcode.equals("JNE")|| opcode.equals("JMA")|| opcode.equals("JSR")){
                     String reg = "";
                     binary2 = "00";
@@ -134,6 +148,12 @@ public class App {
                         binary4 = "0";
                     }
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
+
+                    if (opcode.equals("LDX")) {
+                        // LDX x, address [,I]
+                        LDX(matcher.group(2), matcher.group(3), binary4);
+                    }
+
                 }else if(opcode.equals("Data")){
                     String reg = "";
                     binary2 = "00";
@@ -143,6 +163,9 @@ public class App {
                     binary5 = padBinary(data, 5);
                     binary4 = "0";
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
+
+                    DATA(matcher.group(2));
+
                 }else if(opcode.equals("SETCCE")|| opcode.equals("RFS")){
 
                     String reg = decimalToBinary(matcher.group(2));
@@ -178,10 +201,12 @@ public class App {
                     location = getLocation(locationTracker, true);
                 }
 
+
             } else {
                 // System.out.println(trimmedInput);
                 if(input.equals("Data End")){
-                     result = "002000";
+                    result = "002000";
+                    DATA("1024");
                     location = getLocation(locationTracker, true);
 
                 }else if(input.equals("End: HLT")){
@@ -198,6 +223,62 @@ public class App {
             // assemblerHashtable.put("octal_instruction", result);
             // assemblerHashtable.put("memory_location", location);
             return;
+    }
+
+
+    public static int computeEA(String address, String ix, String indirectBit) {
+        int addressField = Integer.parseInt(address);
+        int ixField = Integer.parseInt(ix);
+        int iField = Integer.parseInt(indirectBit);
+        // System.out.println("addressField: " + address + "\nixField: " + ix + "\niField: " + indirectBit);
+
+        int effectiveAddress = -1;
+
+        if (iField == 0) {
+            // No indirect addressing
+            if (ixField == 0) {
+                // No indexing
+                effectiveAddress = addressField;
+            } else if (ixField >= 1 && ixField <= 3) {
+                // With indexing
+                effectiveAddress = indexRegister.get(ixField-1) + addressField;
+            }
+        } else if (iField == 1) {
+            // Indirect addressing
+            if (ixField == 0) {
+                // No indexing
+                effectiveAddress = memoryAddress.get(addressField);
+            } else if (ixField >= 1 && ixField <=3) {
+                effectiveAddress = memoryAddress.get(indexRegister.get(ixField-1) + addressField);
+            }
+        }
+
+        return effectiveAddress;
+    }
+
+    // LDX x, address [,I]
+    public static void LDX (String ix, String address, String indirectBit) {
+        int ixField = Integer.parseInt(ix) - 1;
+        int EA = computeEA(address, "0", indirectBit);
+
+        indexRegister.set(ixField, memoryAddress.get(EA));
+
+        // System.out.println("Index Register:");
+        // for (int i = 0; i < indexRegister.size(); i++) {
+        //     System.out.print(Integer.toString(i + 1) + ": " + Integer.toString(indexRegister.get(i)) + "\t");
+        // }
+        // System.out.println();
+    }
+    
+    public static void DATA(String data) {
+        memoryAddress.set(Integer.parseInt(locationTracker), Integer.parseInt(data));
+
+        // System.out.println("Data Input: ");
+
+        // for (int i = 0; i < memoryAddress.size(); i++) {
+        //     System.out.print(Integer.toString(i) + ": " + Integer.toString(memoryAddress.get(i)) + "\t");
+        // }
+        // System.out.println();
     }
 
     public static String getLocation(String newLocation, boolean increment) {
