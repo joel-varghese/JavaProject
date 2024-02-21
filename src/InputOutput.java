@@ -1,0 +1,120 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+public class InputOutput {
+    
+    public Map<String, String> fetchOpcodes(String file) {
+        Map<String, String> opcodesMap = new HashMap<>();
+
+        String filename = "./src/input/" + file;
+        
+        BufferedReader reader = null;
+
+        try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = reader.readLine();
+            String trimmedLine;
+
+			while (line != null) {
+				// System.out.println(line);
+                trimmedLine = line.trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
+                String[] codes = trimmedLine.split(",");
+                opcodesMap.put(codes[0], codes[1]);
+				line = reader.readLine();
+			}
+
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}        
+
+        return opcodesMap;
+	}
+	  
+    public ArrayList<String> fetchInstructions(String file) {
+
+        String filename = "./src/input/" + file;
+        ArrayList<String> myInstructions = new ArrayList<String>();
+        BufferedReader reader;
+        String trimmedInput;
+
+        try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = reader.readLine();
+
+			while (line != null) {
+				// System.out.println(line);
+				// read next line
+                trimmedInput = line.trim().replaceAll("\\s+", " ").replaceAll(" *;.*", "");
+                myInstructions.add(trimmedInput);
+				line = reader.readLine();
+			}
+
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return myInstructions;
+	}	
+
+    public void outputFiles(ArrayList<ArrayList<String>> assemblerData) {
+        String path = "src/output/";
+        String filePath1 = path + "load_file.txt";
+        String filePath2 = path + "listing_file.txt";
+
+        BufferedWriter writer1 = null;
+        BufferedWriter writer2 = null;
+
+        try {
+
+            File file1 = new File(filePath1);
+            File file2 = new File(filePath2);
+       
+            /* This logic will make sure that the file 
+             * gets created if it is not present at the
+             * specified location*/
+            
+            FileWriter fw1 = new FileWriter(file1);
+            FileWriter fw2 = new FileWriter(file2);
+            writer1 = new BufferedWriter(fw1);
+            writer2 = new BufferedWriter(fw2);
+            
+            ArrayList<String> memoryLocation = assemblerData.get(0);
+            ArrayList<String> octalInstructions = assemblerData.get(1);
+            ArrayList<String> instructions = assemblerData.get(2);
+
+            for (int i = 0; i < instructions.size(); i++) {
+                if (memoryLocation.get(i) != "" && octalInstructions.get(i) != "" ) {
+                    writer1.write(memoryLocation.get(i) + "\t\t\t" + octalInstructions.get(i) + "\n");
+                } 
+                writer2.write(memoryLocation.get(i) + "\t\t" + octalInstructions.get(i) + "\t\t" + instructions.get(i) + "\n");
+            }
+
+            System.out.println("File written Successfully");
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            try {
+                if(writer1 != null) {
+                    writer1.close();
+                }
+
+                if(writer2 != null) {
+                    writer2.close();
+                }
+ 
+            }catch(Exception ex){
+                System.out.println("Error in closing the BufferedWriter"+ex);
+            }
+        }
+    }
+}
