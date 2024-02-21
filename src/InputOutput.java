@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class InputOutput {
@@ -116,5 +117,29 @@ public class InputOutput {
                 System.out.println("Error in closing the BufferedWriter"+ex);
             }
         }
+    }
+
+    public void printAssemblerData(List<Integer> memoryAddress, List<Integer> generalRegister, List<Integer> indexRegister) {
+
+        System.out.println("Memory Address: ");
+
+        for (int i = 0; i < memoryAddress.size(); i++) {
+            System.out.print(Integer.toString(i) + ": " + Integer.toString(memoryAddress.get(i)) + "\t");
+        }
+        System.out.println();
+
+        System.out.println("General Register: ");
+        for (int i = 0; i < generalRegister.size(); i++) {
+            System.out.print("R" + Integer.toString(i) + ": " + Integer.toString(generalRegister.get(i)) + "\t");
+        }
+        System.out.println();
+
+        System.out.println("Index Register:");
+        for (int i = 0; i < indexRegister.size(); i++) {
+            System.out.print("X" + Integer.toString(i + 1) + ": " + Integer.toString(indexRegister.get(i)) + "\t");
+        }
+        System.out.println();
+
+        return;
     }
 }

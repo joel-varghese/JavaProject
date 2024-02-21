@@ -1,13 +1,6 @@
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-
 public class App {
     
     private static ArrayList<ArrayList<String>> assemblerData = new ArrayList<ArrayList<String>>();
@@ -26,7 +19,7 @@ public class App {
         map = io.fetchOpcodes("opcodes.txt");
         ArrayList<String> memoryLocation = new ArrayList<String>();
         ArrayList<String> octalInstructions = new ArrayList<String>();
-        ArrayList<String> instructions = io.fetchInstructions("input1.txt");
+        ArrayList<String> instructions = io.fetchInstructions("input3.txt");
 
         assemblerData.add(0, memoryLocation);
         assemblerData.add(octalInstructions);
@@ -39,6 +32,7 @@ public class App {
         }
 
         io.outputFiles(assemblerData);
+        // io.printAssemblerData(memoryAddress, generalRegister, indexRegister);
     }
     
     private static void extractOpcodeAndNumbers(String input) {
@@ -266,7 +260,7 @@ public class App {
 
     // X1, X2, X3
     public static void STX(String ix, String address, String indirectBit) {
-        int EA = computeEA(address, ix, indirectBit);
+        int EA = computeEA(address, "00", indirectBit);
 
         System.out.println("EA: " + Integer.toString(EA) + " - Value: " + indexRegister.get(Integer.parseInt(ix)-1));
         
