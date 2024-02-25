@@ -1,6 +1,14 @@
+import java.io.File;
+import java.io.IOException;
+import java.awt.Desktop;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import config.Config;
+import javax.swing.JOptionPane;
+
+import ui.FrontPanel;
+
 public class App {
     
     private static ArrayList<ArrayList<String>> assemblerData = new ArrayList<ArrayList<String>>();
@@ -15,23 +23,38 @@ public class App {
     private static InputOutput io = new InputOutput();
     public static void main(String[] args) {
 
+        String LOG_FILE = "minicomputer-" + System.currentTimeMillis() + "." + Config.LOG_FILE_EXTENSION;
 
+        int computer = 0;
         map = io.fetchOpcodes("opcodes.txt");
         ArrayList<String> memoryLocation = new ArrayList<String>();
         ArrayList<String> octalInstructions = new ArrayList<String>();
         ArrayList<String> instructions = io.fetchInstructions("input3.txt");
 
-        assemblerData.add(0, memoryLocation);
-        assemblerData.add(octalInstructions);
-        assemblerData.add(instructions);
+                FrontPanel window = new FrontPanel(computer);
+        window.menu.fileOpenLog.addActionListener(e -> {
+            try {
+                Desktop.getDesktop().open(new File(LOG_FILE));
+            } catch (IOException e1) {
+                // LOGGER.severe("Failed to open log file: " + e1.getMessage());
+                JOptionPane.showMessageDialog(null,
+                        "Failed to open log file",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        window.setVisible(true);
+        // assemblerData.add(0, memoryLocation);
+        // assemblerData.add(octalInstructions);
+        // assemblerData.add(instructions);
 
-        for(int i=0;i<instructions.size();i++){
-            // System.out.println("1. " + instructions.get(i));
-            extractOpcodeAndNumbers(instructions.get(i));
-            System.out.println(assemblerData.get(0).get(i) + "\t\t" + assemblerData.get(1).get(i) + "\t" + instructions.get(i));
-        }
+        // for(int i=0;i<instructions.size();i++){
+        //     // System.out.println("1. " + instructions.get(i));
+        //     extractOpcodeAndNumbers(instructions.get(i));
+        //     System.out.println(assemblerData.get(0).get(i) + "\t\t" + assemblerData.get(1).get(i) + "\t" + instructions.get(i));
+        // }
 
-        io.outputFiles(assemblerData);
+        // io.outputFiles(assemblerData);
         // io.printAssemblerData(memoryAddress, generalRegister, indexRegister);
     }
     
