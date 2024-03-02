@@ -72,18 +72,23 @@ public class App {
             }
         });
         window.setVisible(true);
-        // assemblerData.add(0, memoryLocation);
-        // assemblerData.add(octalInstructions);
-        // assemblerData.add(instructions);
 
-        // for(int i=0;i<instructions.size();i++){
-        //     // System.out.println("1. " + instructions.get(i));
-        //     extractOpcodeAndNumbers(instructions.get(i));
-        //     System.out.println(assemblerData.get(0).get(i) + "\t\t" + assemblerData.get(1).get(i) + "\t" + instructions.get(i));
-        // }
+        ArrayList<String> memoryLocation = new ArrayList<String>();
+        ArrayList<String> octalInstructions = new ArrayList<String>();
+        ArrayList<String> instructions = io.fetchInstructions("input1.txt");
 
-        // io.outputFiles(assemblerData);
-        // io.printAssemblerData(memoryAddress, generalRegister, indexRegister);
+        assemblerData.add(0, memoryLocation);
+        assemblerData.add(octalInstructions);
+        assemblerData.add(instructions);
+
+        for(int i=0;i<instructions.size();i++){
+            // System.out.println("1. " + instructions.get(i));
+            extractOpcodeAndNumbers(instructions.get(i));
+            System.out.println(assemblerData.get(0).get(i) + "\t\t" + assemblerData.get(1).get(i) + "\t" + instructions.get(i));
+        }
+
+        io.outputFiles(assemblerData);
+        io.outputAssemblerData(memoryAddress, generalRegister, indexRegister);
     }
     
     private static void extractOpcodeAndNumbers(String input) {
