@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import javax.swing.JTextField;
 
+import components.io.Device;
 
-public class Keyboard extends JTextField {
+
+public class Keyboard extends JTextField implements Device{
 
     public ArrayList<Character> buffer = new ArrayList<Character>();
 

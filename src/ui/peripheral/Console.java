@@ -5,8 +5,10 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import components.io.Device;
 
-public class Console extends JPanel {
+
+public class Console extends JPanel implements Device{
 
     public JTextArea textArea = new JTextArea();
 

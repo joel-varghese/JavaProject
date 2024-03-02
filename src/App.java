@@ -2,11 +2,17 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.Desktop;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.LogManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.logging.Logger;
 import config.Config;
 import javax.swing.JOptionPane;
 
+import components.Computer;
+import components.ROM;
 import ui.FrontPanel;
 
 public class App {
@@ -16,20 +22,42 @@ public class App {
     private static List<Integer> generalRegister = new ArrayList<Integer>(Collections.nCopies(4, 0)); // R0, R1, R2, R3. For use w LDR
     private static List<Integer> indexRegister = new ArrayList<Integer>(Collections.nCopies(3, 0)); // X1, X2, X3. For use w LDX
     private static List<Integer> memoryAddress = new ArrayList<Integer>(Collections.nCopies(2048, 0)); // 2048
-
+    public static Logger LOGGER = Logger.getLogger("");
     private static String locationTracker = "";
 
     private static Number number = new Number();
     private static InputOutput io = new InputOutput();
     public static void main(String[] args) {
-
+        
         String LOG_FILE = "minicomputer-" + System.currentTimeMillis() + "." + Config.LOG_FILE_EXTENSION;
 
-        int computer = 0;
+        Computer computer;
         map = io.fetchOpcodes("opcodes.txt");
-        ArrayList<String> memoryLocation = new ArrayList<String>();
-        ArrayList<String> octalInstructions = new ArrayList<String>();
-        ArrayList<String> instructions = io.fetchInstructions("input3.txt");
+
+                try {
+            LogManager.getLogManager().reset();
+            LOGGER.setUseParentHandlers(false);
+
+            FileHandler fh = new FileHandler(LOG_FILE, true);
+            LOGGER.addHandler(fh);
+
+            ConsoleHandler ch = new ConsoleHandler();
+            LOGGER.addHandler(ch);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "Failed to configure logging for the application",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+
+        File iplFile = new File(Config.ROM_IPL_FILENAME);
+        if (iplFile.exists()) {
+            computer = new Computer(new ROM(iplFile));
+        } else {
+            computer = new Computer();
+        }
 
                 FrontPanel window = new FrontPanel(computer);
         window.menu.fileOpenLog.addActionListener(e -> {
