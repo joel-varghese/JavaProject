@@ -119,6 +119,53 @@ public class InputOutput {
         }
     }
 
+
+    public void outputAssemblerData(List<Integer> memoryAddress, List<Integer> generalRegister, List<Integer> indexRegister) {
+        String path = "src/output/";
+        String filePath = path + "assembler_data.txt";
+        BufferedWriter writer = null;
+
+        try {
+            File file = new File(filePath);
+            FileWriter fw = new FileWriter(file);
+            writer = new BufferedWriter(fw);
+
+            writer.write("Memory Address: \n");
+
+            for (int i = 0; i < memoryAddress.size(); i++) {
+                writer.write(Integer.toString(i) + ": " + Integer.toString(memoryAddress.get(i)) + "\t");
+            }
+            writer.write("\n\n");
+    
+            writer.write("General Register: \n");
+            for (int i = 0; i < generalRegister.size(); i++) {
+                writer.write("R" + Integer.toString(i) + ": " + Integer.toString(generalRegister.get(i)) + "\t\t");
+            }
+            writer.write("\n\n");
+    
+            writer.write("Index Register: \n");
+            for (int i = 0; i < indexRegister.size(); i++) {
+                writer.write("X" + Integer.toString(i + 1) + ": " + Integer.toString(indexRegister.get(i)) + "\t\t");
+            }
+            writer.write("\n");
+
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            try {
+                if(writer != null) {
+                    writer.close();
+                }
+
+            }catch(Exception ex){
+                System.out.println("Error in closing the BufferedWriter"+ex);
+            }
+        }
+
+        return;
+    }
+
     public void printAssemblerData(List<Integer> memoryAddress, List<Integer> generalRegister, List<Integer> indexRegister) {
 
         System.out.println("Memory Address: ");
