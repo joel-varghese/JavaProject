@@ -133,6 +133,24 @@ public class FrontPanel extends JFrame {
         controlPanel.runButton.addActionListener(e -> {
             computer.run();
         });
+
+        indicatorPanel.IPLButton.addActionListener(e -> {
+
+            computer.reset();
+            registerListeners();
+            JOptionPane.showMessageDialog(this, "Minicomputer reset successfully!", "Success",
+            JOptionPane.INFORMATION_MESSAGE);
+
+
+            int returnVal = fileChooser.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                ROM rom = new ROM(fileChooser.getSelectedFile());
+                computer.loadROM(rom);
+                JOptionPane.showMessageDialog(this, "ROM loaded successfully!", "Success",
+                JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        });
     }
 
     /**

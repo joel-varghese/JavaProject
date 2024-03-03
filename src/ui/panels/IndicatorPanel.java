@@ -1,9 +1,12 @@
 package ui.panels;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import config.Config;
 import ui.Colors;
@@ -42,6 +45,9 @@ public class IndicatorPanel extends JPanel {
     // Condition Code (cc) indicator group
     // 4-bit
     public IndicatorGroup ccGroup;
+
+    // IPL Button to Load Listing file
+    public JButton IPLButton;
 
     public IndicatorPanel() {
         super();
@@ -83,6 +89,8 @@ public class IndicatorPanel extends JPanel {
 
         // Setup indicator for condition code register
         ccGroup = new IndicatorGroup(4, false, "CC");
+
+        IPLButton = new JButton("IPL");
 
         // Add instruction, program counter, and condition code indicator groups to the panel
         gbc.gridx = 0;
@@ -143,6 +151,11 @@ public class IndicatorPanel extends JPanel {
 
         gbc.gridy = 5;
         add(r3Group, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridheight = 2;
+        add(IPLButton, gbc);
 
     }
 
