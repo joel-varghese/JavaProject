@@ -317,9 +317,7 @@ public class App {
     // X1, X2, X3
     public static void STX(String ix, String address, String indirectBit) {
         int EA = computeEA(address, "00", indirectBit);
-
-        System.out.println("EA: " + Integer.toString(EA) + " - Value: " + indexRegister.get(Integer.parseInt(ix)-1));
-        
+        // System.out.println("EA: " + Integer.toString(EA) + " - Value: " + indexRegister.get(Integer.parseInt(ix)-1));
         memoryAddress.set(EA, indexRegister.get(Integer.parseInt(ix)-1));
     }
 
