@@ -54,7 +54,7 @@ public class RegisterTextField extends JPanel {
      * @param value The value to set the register to
      */
     public void set(char value) {
-        textField.setText(String.format("0x%04X", (int) value));
+        textField.setText(String.format("00%s",Integer.toBinaryString((int) value)));
     }
 
 }

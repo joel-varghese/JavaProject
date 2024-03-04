@@ -61,7 +61,8 @@ public class IndicatorGroup extends JComponent {
         indicators = new Indicator[bits];
 
         for (int bit = 0; bit < bits; bit++) {
-            indicators[bit] = (numbered) ? new Indicator(Integer.toString(bit)) : new Indicator();
+            int index = bits - bit -1;
+            indicators[bit] = (numbered) ? new Indicator(Integer.toString(index)) : new Indicator();
             indicators[bit].setBounds((bit * Indicator.WIDTH) + (Indicator.SPACING / 2),
                     INDICATOR_Y,
                     Indicator.WIDTH,
