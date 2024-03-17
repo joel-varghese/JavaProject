@@ -22,8 +22,9 @@ public class App {
     private static List<Integer> generalRegister = new ArrayList<Integer>(Collections.nCopies(4, 0)); // R0, R1, R2, R3. For use w LDR
     private static List<Integer> indexRegister = new ArrayList<Integer>(Collections.nCopies(3, 0)); // X1, X2, X3. For use w LDX
     private static List<Integer> memoryAddress = new ArrayList<Integer>(Collections.nCopies(2048, 0)); // 2048
+    private static List<Integer> conditionCode = new ArrayList<Integer>(4);  // cc(0), cc(1), cc(2), cc(3) or OVERFLOW, UNDERFLOW, DIVZERO, EQUALORNOT
     public static Logger LOGGER = Logger.getLogger("");
-    private static String locationTracker = "";
+    private static String PC = "";
 
     private static Number number = new Number();
     private static InputOutput io = new InputOutput();
@@ -128,11 +129,17 @@ public class App {
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
 
                     if (opcode.equals("LDR")){
+                        // r, x, address[,I]
                         LDR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
                     } else if (opcode.equals("LDA")) {
+                        // r, x, address[,I]
                         LDA(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
                     } else if (opcode.equals("STR")) {
+                        // r, x, address[,I]
                         STR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                    } else if (opcode.equals("JCC")) {
+                        JCC(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                       
                     }
 
                 }else if(opcode .equals("LDX") || opcode.equals("STX") || opcode.equals("JZ") || opcode.equals("JNE")|| opcode.equals("JMA")|| opcode.equals("JSR")){
@@ -153,11 +160,21 @@ public class App {
                         // LDX x, address [,I]
                         LDX(matcher.group(2), matcher.group(3), binary4);
                     } else if (opcode.equals("STX")) {
+                        // STX x, address[,I]
                         STX(matcher.group(2), matcher.group(3), binary4);
                         System.out.println("IX: " + matcher.group(2) + " Addr: " + matcher.group(3) + "Indirect Bit: " + binary4);
+                    } else if (opcode.equals("JZ")) {
+                        // JZ x, address[,I]
+                        JZ(matcher.group(2), matcher.group(3), binary4);
+                    } else if (opcode.equals("JNE")) {
+                        // JNE x, address[,I]
+                        JNE(matcher.group(2), matcher.group(3), binary4);
+                    } else if (opcode.equals("JMA")) {
+                        // JCC cc, x, address[,I]
+                        JMA(matcher.group(2), matcher.group(3), binary4);
                     }
 
-                }else if(opcode.equals("Data")){
+                } else if(opcode.equals("Data")){
                     String reg = "";
                     binary2 = "00";
                     String ix = "";
@@ -179,6 +196,11 @@ public class App {
                     binary5 = "00000";
                     binary4 = "0";
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
+
+                    if (opcode.equals("SETCCE")) {
+                        SETCCE(reg);
+                    }
+                    
                 }else if(opcode.equals("MLT") || opcode.equals("DVD") || opcode.equals("TRR") || opcode.equals("AND") || opcode.equals("ORR")){
                     String reg = number.decimalToBinary(matcher.group(2));
                     binary2 = number.padBinary(reg, 2);
@@ -197,11 +219,11 @@ public class App {
                 } 
 
                 if (opcode.equals("LOC")) {
-                    // locationTracker = matcher.group(2);
+                    // PC = matcher.group(2);
                     location = getLocation(matcher.group(2), false);
                     location = "";
                 } else {
-                    location = getLocation(locationTracker, true);
+                    location = getLocation(PC, true);
                 }
 
 
@@ -210,7 +232,7 @@ public class App {
                 if(input.equals("Data End")){
                     result = "002000";
                     DATA("1024");
-                    location = getLocation(locationTracker, true);
+                    location = getLocation(PC, true);
 
                 }else if(input.equals("End: HLT")){
                     result = "000000";
@@ -258,7 +280,7 @@ public class App {
         return effectiveAddress;
     }
     public static void DATA(String data) {
-        memoryAddress.set(Integer.parseInt(locationTracker), Integer.parseInt(data));
+        memoryAddress.set(Integer.parseInt(PC), Integer.parseInt(data));
 
         // System.out.println("Data Input: ");
 
@@ -321,16 +343,70 @@ public class App {
         memoryAddress.set(EA, indexRegister.get(Integer.parseInt(ix)-1));
     }
 
+    public static void SETCCE(String reg) {
+        int r = Integer.parseInt(reg);
+        if (r < 0 || r >= conditionCode.size()) {
+            System.out.println("Invalid register index");
+            return;
+        }
+
+        // Assuming c(r) returns the value in the register r
+        // Check if the value in register r is 0
+        if (generalRegister.get(r) == 0) {
+            // Set the E bit of the condition code to 1
+            conditionCode.set(3, 1);
+        } else {
+            // Set the E bit of the condition code to 0
+            conditionCode.set(3, 0);
+        }
+    }
+
+    public static void JZ(String ix, String address, String indirectBit) {
+        // int x, int address, boolean indirect
+        int EA = computeEA(address, ix, indirectBit);
+        if (conditionCode.get(3) == 1) { // Check if E bit of condition code is 1 (Zero flag)
+            getLocation(Integer.toString(EA), false);
+        } else {
+            getLocation(PC, true);
+        }
+    }
+
+    public static void JNE(String ix, String address, String indirectBit){
+        // int x, int address, boolean indirect
+        int EA = computeEA(address, ix, indirectBit);
+        if (conditionCode.get(3) == 0) { // Check if E bit of condition code is 0
+            getLocation(Integer.toString(EA), false);
+        } else {
+            getLocation(PC, true);
+        }        
+    }
+
+    public static void JCC(String cc, String ix, String address, String indirectBit){
+        // int condition code, int x, int address, boolean indirect
+        int EA = computeEA(address, ix, indirectBit);
+        if (conditionCode.get(Integer.parseInt(cc)) == 1) { // Check if E bit of condition code is 0
+            getLocation(Integer.toString(EA), false);
+        } else {
+            getLocation(PC, true);
+        }        
+    }
+
+    public static void JMA(String ix, String address, String indirectBit) {
+        // int x, int address, boolean indirect
+        int EA = computeEA(address, ix, indirectBit); 
+        getLocation(Integer.toString(EA), false);
+    }
+
     public static String getLocation(String newLocation, boolean increment) {
 
-        locationTracker = newLocation;
+        PC = newLocation;
         String location;
-        location = number.decimalToBinary(locationTracker);
+        location = number.decimalToBinary(PC);
         location = number.binaryToOctal(location);
         location = number.padBinary(location, 6);
 
         if (increment) {
-            locationTracker = number.addDecimals(locationTracker, 1);
+            PC = number.addDecimals(PC, 1);
         }
         
         return location;
