@@ -22,7 +22,7 @@ public class App {
     private static List<Integer> generalRegister = new ArrayList<Integer>(Collections.nCopies(4, 0)); // R0, R1, R2, R3. For use w LDR
     private static List<Integer> indexRegister = new ArrayList<Integer>(Collections.nCopies(3, 0)); // X1, X2, X3. For use w LDX
     private static List<Integer> memoryAddress = new ArrayList<Integer>(Collections.nCopies(2048, 0)); // 2048
-    private static List<Integer> conditionCode = new ArrayList<Integer>(4);  // cc(0), cc(1), cc(2), cc(3) or OVERFLOW, UNDERFLOW, DIVZERO, EQUALORNOT
+    private static List<Integer> conditionCode = new ArrayList<Integer>(4);  // cc(0) = OVERFLOW, cc(1) = UNDERFLOW, cc(2) = DIVZERO, cc(3) = EQUALORNOT
     public static Logger LOGGER = Logger.getLogger("");
     private static String PC = "";
 
@@ -114,7 +114,7 @@ public class App {
                 if(map.get(opcode) != null){binary1 = number.decimalToBinary(map.get(opcode));}
                 binary1 = number.padBinary(binary1, 6);
                 // System.out.print(binary1);
-                if((opcode.equals("LDR")) || (opcode.equals("LDA")) || (opcode.equals("STR") || opcode.equals("JCC")|| opcode.equals("SOB")|| opcode.equals("JGE")|| opcode.equals("AMR")|| opcode.equals("SMR"))){
+                if((opcode.equals("LDR")) || (opcode.equals("LDA")) || (opcode.equals("STR") || opcode.equals("JCC")|| opcode.equals("SOB")|| opcode.equals("JGE")|| opcode.equals("AMR")|| opcode.equals("SMR") || opcode.equals("JGE"))){
                     String reg = number.decimalToBinary(matcher.group(2));
                     binary2 = number.padBinary(reg, 2);
                     String ix = number.decimalToBinary(matcher.group(3));
@@ -139,7 +139,15 @@ public class App {
                         STR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
                     } else if (opcode.equals("JCC")) {
                         JCC(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
-                       
+                    } else if (opcode.equals("SOB")) {
+                        // r, x, address[,I]
+                        SOB(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                    } else if (opcode.equals("JGE")) {
+                        // r,x, address[,I]
+                        JGE(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                    } else if (opcode.equals("AMR")) {
+                        // r, x, address[,I]
+                        AMR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
                     }
 
                 }else if(opcode .equals("LDX") || opcode.equals("STX") || opcode.equals("JZ") || opcode.equals("JNE")|| opcode.equals("JMA")|| opcode.equals("JSR")){
@@ -172,6 +180,8 @@ public class App {
                     } else if (opcode.equals("JMA")) {
                         // JCC cc, x, address[,I]
                         JMA(matcher.group(2), matcher.group(3), binary4);
+                    } else if (opcode.equals("JSR")) {
+                        JSR(matcher.group(2), matcher.group(3), binary4);
                     }
 
                 } else if(opcode.equals("Data")){
@@ -210,9 +220,17 @@ public class App {
                     binary5 = "00000";
                     binary4 = "0";
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
+
+                    if (opcode.equals("MLT")) {
+                        MLT(matcher.group(2), matcher.group(3));
+                    } else if (opcode.equals("DVD")){
+                        DVD(matcher.group(2), matcher.group(3));
+                    }
+
                 }else if(opcode.equals("LOC")){
                     result = "";
                 }
+
                 if(result.length() > 0){
                     result = number.binaryToOctal(result);
                     result = number.padBinary(result, 6);
@@ -220,10 +238,10 @@ public class App {
 
                 if (opcode.equals("LOC")) {
                     // PC = matcher.group(2);
-                    location = getLocation(matcher.group(2), false);
+                    location = setLocation(matcher.group(2), false);
                     location = "";
                 } else {
-                    location = getLocation(PC, true);
+                    location = setLocation(PC, true);
                 }
 
 
@@ -232,11 +250,11 @@ public class App {
                 if(input.equals("Data End")){
                     result = "002000";
                     DATA("1024");
-                    location = getLocation(PC, true);
+                    location = setLocation(PC, true);
 
                 }else if(input.equals("End: HLT")){
                     result = "000000";
-                    location = getLocation("1024", true);
+                    location = setLocation("1024", true);
                 }
             }
 
@@ -361,43 +379,187 @@ public class App {
         }
     }
 
+    // Jump If Zero
     public static void JZ(String ix, String address, String indirectBit) {
         // int x, int address, boolean indirect
         int EA = computeEA(address, ix, indirectBit);
         if (conditionCode.get(3) == 1) { // Check if E bit of condition code is 1 (Zero flag)
-            getLocation(Integer.toString(EA), false);
+            setLocation(Integer.toString(EA), false);
         } else {
-            getLocation(PC, true);
+            setLocation(PC, true);
         }
     }
 
+    // Jump If Not Equal
     public static void JNE(String ix, String address, String indirectBit){
         // int x, int address, boolean indirect
         int EA = computeEA(address, ix, indirectBit);
         if (conditionCode.get(3) == 0) { // Check if E bit of condition code is 0
-            getLocation(Integer.toString(EA), false);
+            setLocation(Integer.toString(EA), false);
         } else {
-            getLocation(PC, true);
+            setLocation(PC, true);
         }        
     }
 
+    // Jump If Condition Code
     public static void JCC(String cc, String ix, String address, String indirectBit){
         // int condition code, int x, int address, boolean indirect
         int EA = computeEA(address, ix, indirectBit);
         if (conditionCode.get(Integer.parseInt(cc)) == 1) { // Check if E bit of condition code is 0
-            getLocation(Integer.toString(EA), false);
+            setLocation(Integer.toString(EA), false);
         } else {
-            getLocation(PC, true);
+            setLocation(PC, true);
         }        
     }
 
+    // Unconditional Jump To Address
     public static void JMA(String ix, String address, String indirectBit) {
         // int x, int address, boolean indirect
         int EA = computeEA(address, ix, indirectBit); 
-        getLocation(Integer.toString(EA), false);
+        setLocation(Integer.toString(EA), false);
     }
 
-    public static String getLocation(String newLocation, boolean increment) {
+    // Jump and Save Return Address
+    public static void JSR(String ix, String address, String indirectBit) {
+        int EA;
+        int argumentPointer;
+        setLocation(PC, true);
+        generalRegister.set(3, Integer.parseInt(PC));
+
+        EA = computeEA(address, ix, indirectBit); 
+        setLocation(Integer.toString(EA), false);
+
+        /*
+         * R0 should contain pointer to arguments
+         *  Argument list should end with –1 (all 1s) value
+         */
+        // Set R0 to point to the arguments
+        generalRegister.set(0, EA);
+
+        // Example: Process arguments until -1 is encountered
+        argumentPointer = EA;
+        while (memoryAddress.get(argumentPointer) != -1) {
+            // Run subroutine and Process arguments here
+            argumentPointer++;
+        }
+    }
+
+    // Return From Subroutine 
+    public static void RFS() {
+
+    }
+
+    // Subtract One and Branch
+    public static void SOB(String register, String ix, String address, String indirectBit) {
+        int R = Integer.parseInt(register);
+        int contentR = generalRegister.get(R);
+        int EA = computeEA(address, ix, indirectBit);
+
+        generalRegister.set(R, contentR - 1);
+
+        if (generalRegister.get(R) > 0) {
+            // Set PC to the effective address
+            setLocation(Integer.toString(EA), false);
+        } else {
+            // PC <- PC + 1
+            setLocation(PC, true);
+        }
+    }
+
+    // Jump Greater Than or Equal To
+    public static void JGE(String register, String ix, String address, String indirectBit) {
+        int R = Integer.parseInt(register);
+        int contentR = generalRegister.get(R);
+        int EA = computeEA(address, ix, indirectBit);
+
+        if (generalRegister.get(R) >= 0) {
+            // Set PC to the effective address
+            setLocation(Integer.toString(EA), false);
+        } else {
+            // PC <- PC + 1
+            setLocation(PC, true);
+        }
+    }
+
+    // Add Memory To Register
+    public static void AMR(String register, String ix, String address, String indirectBit) {
+        // r, x, address[,I]
+        int EA = computeEA(address, ix, indirectBit);
+        int R = Integer.parseInt(register);
+        int contentR = generalRegister.get(R);
+
+        generalRegister.set(R, contentR + EA);
+    }
+
+    public static void SMR(String register, String ix, String address, String indirectBit) {
+        // r, x, address[,I]
+        int EA = computeEA(address, ix, indirectBit);
+        int R = Integer.parseInt(register);
+        int contentR = generalRegister.get(R);
+
+        generalRegister.set(R, contentR - EA);        
+    }
+
+    // Add  Immediate to Register
+    public static void AIR() {
+
+    }
+
+    // Subtract  Immediate from Register
+    public static void SIR(){
+
+    }
+
+    // Multiply Register by Register
+    public static void MLT(String registerX, String registerY) {
+        int rx = Integer.parseInt(registerX);
+        int ry = Integer.parseInt(registerY);
+
+        // Check if rx and ry are valid registers
+        if ((rx != 0 && rx != 2) || (ry != 0 && ry != 2)) {
+            System.out.println("Invalid register combination");
+            return;
+        }
+
+        // Perform the multiplication
+        long result = (long)generalRegister.get(rx) * (long)generalRegister.get(ry);
+
+        // Check for overflow
+        if (result > Integer.MAX_VALUE || result < Integer.MIN_VALUE) {
+            // Set the OVERFLOW bit of the condition code to True (1) if overflow
+            conditionCode.set(0, 1);
+            return;
+        }
+        // Store the result in rx and rx+1
+        generalRegister.set(rx, (int) (result >> 32)); // High-order bits
+        generalRegister.set(rx + 1, (int) result);     // Low-order bits
+
+    }
+
+    // Divide Register by Register
+    public static void DVD(String registerX, String registerY) {
+        int rx = Integer.parseInt(registerX);
+        int ry = Integer.parseInt(registerY);
+
+        // Check if rx and ry are valid registers
+        if ((rx != 0 && rx != 2) || (ry != 0 && ry != 2)) {
+            System.out.println("Invalid register combination");
+            return;
+        }
+
+        // Check if divisor is zero
+        if (generalRegister.get(ry) == 0) {
+            // set DIVZERO flag
+            conditionCode.set(2, 1);
+            return;
+        }
+
+        // Perform the division
+        generalRegister.set(rx, generalRegister.get(rx) / generalRegister.get(ry)); // Quotient
+        generalRegister.set(rx + 1, generalRegister.get(rx) % generalRegister.get(ry)); // Remainder
+    }   
+
+    public static String setLocation(String newLocation, boolean increment) {
 
         PC = newLocation;
         String location;
