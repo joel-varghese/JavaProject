@@ -50,4 +50,16 @@ public class Number {
         number += decimalInt;
         return Integer.toString(number);
     }
+
+
+    public int charToInt(char c) {
+        int numericC = (int) c;
+
+        if (numericC >= 48 && numericC <= 57) {
+            numericC = numericC - 48;
+        }
+
+        return numericC;
+    }
+
 }
