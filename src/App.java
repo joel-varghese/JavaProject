@@ -10,6 +10,9 @@ import java.util.regex.Pattern;
 import java.util.logging.Logger;
 import config.Config;
 import javax.swing.JOptionPane;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import components.Computer;
 import components.ROM;
@@ -114,7 +117,8 @@ public class App {
                 if(map.get(opcode) != null){binary1 = number.decimalToBinary(map.get(opcode));}
                 binary1 = number.padBinary(binary1, 6);
                 // System.out.print(binary1);
-                if((opcode.equals("LDR")) || (opcode.equals("LDA")) || (opcode.equals("STR") || opcode.equals("JCC")|| opcode.equals("SOB")|| opcode.equals("JGE")|| opcode.equals("AMR")|| opcode.equals("SMR") || opcode.equals("JGE"))){
+                if((opcode.equals("LDR")) || (opcode.equals("LDA")) || (opcode.equals("STR") || opcode.equals("JCC")|| opcode.equals("SOB")|| opcode.equals("JGE")|| opcode.equals("AMR")|| opcode.equals("SMR") || opcode.equals("JGE") || opcode.equals("SRC") || opcode.equals("RRC"))){
+                    // Use register, index register, address, and optionally indirect bit
                     String reg = number.decimalToBinary(matcher.group(2));
                     binary2 = number.padBinary(reg, 2);
                     String ix = number.decimalToBinary(matcher.group(3));
@@ -128,61 +132,175 @@ public class App {
                     }
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
 
-                    if (opcode.equals("LDR")){
-                        // r, x, address[,I]
-                        LDR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
-                    } else if (opcode.equals("LDA")) {
-                        // r, x, address[,I]
-                        LDA(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
-                    } else if (opcode.equals("STR")) {
-                        // r, x, address[,I]
-                        STR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
-                    } else if (opcode.equals("JCC")) {
-                        JCC(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
-                    } else if (opcode.equals("SOB")) {
-                        // r, x, address[,I]
-                        SOB(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
-                    } else if (opcode.equals("JGE")) {
-                        // r,x, address[,I]
-                        JGE(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
-                    } else if (opcode.equals("AMR")) {
-                        // r, x, address[,I]
-                        AMR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                    switch(opcode) {
+                        case "LDR":
+                            // r, x, address[,I]
+                            LDR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                            break;
+                        case "LDA":
+                            // r, x, address[,I]
+                            LDA(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                            break;
+                        case "STR":
+                            // r, x, address[,I]
+                            STR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                            break;
+                        case "JCC":
+                            JCC(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                            break;
+                        case "SOB":
+                            // r, x, address[,I]
+                            SOB(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                            break;
+                        case "JGE":
+                            // r,x, address[,I]
+                            JGE(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                            break;  
+                        case "AMR":
+                            // r, x, address[,I]
+                            AMR(matcher.group(2), matcher.group(3), matcher.group(4), binary4);
+                            break;
+                        case "SRC":
+                            // r = register, L/R = index register, A/L = indirect bit, count = address
+                            SRC(matcher.group(2), matcher.group(3), binary4, matcher.group(4));
+                            break;
+                        case "RRC":
+                            RRC(matcher.group(2), matcher.group(3), binary4, matcher.group(4));
+                            break;
                     }
 
                 }else if(opcode .equals("LDX") || opcode.equals("STX") || opcode.equals("JZ") || opcode.equals("JNE")|| opcode.equals("JMA")|| opcode.equals("JSR")){
+                    // Use index register, address, and optinally indirect bit
                     String reg = "";
                     binary2 = "00";
-                    String ix = number.decimalToBinary(matcher.group(2));
+                    String ix = number.decimalToBinary(matcher.group(2));   // x
                     binary3 = number.padBinary(ix, 2);
-                    String addr = number.decimalToBinary(matcher.group(3));
+                    String addr = number.decimalToBinary(matcher.group(3)); // add
                     binary5 = number.padBinary(addr, 5);
-                    if(matcher.group(4) != null){
+                    if(matcher.group(4) != null){  // [,I]
                         binary4 = "1";
                     }else{
                         binary4 = "0";
                     }
                     result = binary1 + binary2 + binary3 + binary4 + binary5;
 
-                    if (opcode.equals("LDX")) {
-                        // LDX x, address [,I]
-                        LDX(matcher.group(2), matcher.group(3), binary4);
-                    } else if (opcode.equals("STX")) {
-                        // STX x, address[,I]
-                        STX(matcher.group(2), matcher.group(3), binary4);
-                        System.out.println("IX: " + matcher.group(2) + " Addr: " + matcher.group(3) + "Indirect Bit: " + binary4);
-                    } else if (opcode.equals("JZ")) {
-                        // JZ x, address[,I]
-                        JZ(matcher.group(2), matcher.group(3), binary4);
-                    } else if (opcode.equals("JNE")) {
-                        // JNE x, address[,I]
-                        JNE(matcher.group(2), matcher.group(3), binary4);
-                    } else if (opcode.equals("JMA")) {
-                        // JCC cc, x, address[,I]
-                        JMA(matcher.group(2), matcher.group(3), binary4);
-                    } else if (opcode.equals("JSR")) {
-                        JSR(matcher.group(2), matcher.group(3), binary4);
+                    switch (opcode) {
+                        case "LDX":
+                            // LDX x, address [,I]
+                            LDX(matcher.group(2), matcher.group(3), binary4);
+                            break;
+                        case "STX":
+                            // STX x, address[,I]
+                            STX(matcher.group(2), matcher.group(3), binary4);
+                            break;
+                        case "JZ":
+                            // JZ x, address[,I]
+                            JZ(matcher.group(2), matcher.group(3), binary4);
+                            break;
+                        case "JNE":
+                            // JNE x, address[,I]
+                            JNE(matcher.group(2), matcher.group(3), binary4);
+                            break;
+                        case "JMA":
+                            JMA(matcher.group(2), matcher.group(3), binary4);
+                            break;
+                        case "JSR":
+                            JSR(matcher.group(2), matcher.group(3), binary4);
+                            break;
                     }
+                } else if(opcode.equals("MLT") || opcode.equals("DVD") || opcode.equals("TRR") || opcode.equals("AND") || opcode.equals("ORR") || opcode.equals("IN") || opcode.equals("OUT")){
+                    // Use 2 registers: register x and register y
+                    String reg = number.decimalToBinary(matcher.group(2)); // rx
+                    binary2 = number.padBinary(reg, 2);
+                    String ix = number.decimalToBinary(matcher.group(3)); // ry
+                    binary3 = number.padBinary(ix, 2);
+                    String addr = "";
+                    binary5 = "00000";
+                    binary4 = "0";
+                    result = binary1 + binary2 + binary3 + binary4 + binary5;
+
+                    switch (opcode) {
+                        case "MLT":
+                            // rx,ry
+                            MLT(matcher.group(2), matcher.group(3));
+                            break;
+                        case "DVD":
+                            DVD(matcher.group(2), matcher.group(3));
+                            break;
+                        case "TRR":
+                            TRR(matcher.group(2), matcher.group(3));
+                            break;
+                        case "AND":
+                            AND(matcher.group(2), matcher.group(3));
+                            break;
+                        case "ORR":
+                            ORR(matcher.group(2), matcher.group(3));
+                            break;
+                        case "IN":
+                            IN(matcher.group(2), matcher.group(3));
+                            break;
+                        case "OUT":
+                            OUT(matcher.group(2), matcher.group(3));
+                            break;
+                    }
+
+                } else if (opcode.equals("AIR") || opcode.equals("SIR")){
+                    // Use register and address
+                    String reg = number.decimalToBinary(matcher.group(2));
+                    binary2 = number.padBinary(reg, 2);
+                    String ix = "";
+                    binary3 = "00";
+                    String addr = number.decimalToBinary(matcher.group(4));
+                    binary5 = number.padBinary(addr, 5);
+                    binary4 = "0";
+                    
+                    result = binary1 + binary2 + binary3 + binary4 + binary5;
+                    switch (opcode) {
+                        case "AIR":
+                            // AIR r, immed is stored in address field
+                            AIR(matcher.group(2), matcher.group(4));
+                            break;
+                        case "SIR":
+                            // SIR r, immed
+                            SIR(matcher.group(2), matcher.group(4));
+                            break;
+                    }
+
+                } else if (opcode.equals("RFS")) {
+                    // Use address for immed
+                    String reg = "";
+                    binary2 = "00";
+                    String ix = "";
+                    binary3 = "00";
+                    String addr = number.decimalToBinary(matcher.group(4));
+                    binary5 = number.padBinary(addr, 5);
+                    binary4 = "0";
+                    
+                    result = binary1 + binary2 + binary3 + binary4 + binary5;
+
+                    // RFS Immed
+                    RFS(matcher.group(2));
+
+                }else if(opcode.equals("SETCCE")|| opcode.equals("NOT")){
+                    // Use register
+                    String reg = number.decimalToBinary(matcher.group(2)); // r
+                    binary2 = number.padBinary(reg, 2);
+                    String ix = "";
+                    binary3 = "00";
+                    String addr = "";
+                    binary5 = "00000";
+                    binary4 = "0";
+                    result = binary1 + binary2 + binary3 + binary4 + binary5;
+
+                    switch (opcode) {
+                        case "SETCCE":
+                            // SETCCE(reg);
+                            SETCCE(matcher.group(2));
+                            break;
+                        case "NOT":
+                            NOT(matcher.group(2));
+                            break;
+                    }  
 
                 } else if(opcode.equals("Data")){
                     String reg = "";
@@ -196,38 +314,7 @@ public class App {
 
                     DATA(matcher.group(2));
 
-                }else if(opcode.equals("SETCCE")|| opcode.equals("RFS")){
-
-                    String reg = number.decimalToBinary(matcher.group(2));
-                    binary2 = number.padBinary(reg, 2);
-                    String ix = "";
-                    binary3 = "00";
-                    String addr = "";
-                    binary5 = "00000";
-                    binary4 = "0";
-                    result = binary1 + binary2 + binary3 + binary4 + binary5;
-
-                    if (opcode.equals("SETCCE")) {
-                        SETCCE(reg);
-                    }
-                    
-                }else if(opcode.equals("MLT") || opcode.equals("DVD") || opcode.equals("TRR") || opcode.equals("AND") || opcode.equals("ORR")){
-                    String reg = number.decimalToBinary(matcher.group(2));
-                    binary2 = number.padBinary(reg, 2);
-                    String ix = number.decimalToBinary(matcher.group(3));
-                    binary3 = number.padBinary(ix, 2);
-                    String addr = "";
-                    binary5 = "00000";
-                    binary4 = "0";
-                    result = binary1 + binary2 + binary3 + binary4 + binary5;
-
-                    if (opcode.equals("MLT")) {
-                        MLT(matcher.group(2), matcher.group(3));
-                    } else if (opcode.equals("DVD")){
-                        DVD(matcher.group(2), matcher.group(3));
-                    }
-
-                }else if(opcode.equals("LOC")){
+                } else if (opcode.equals("LOC")){
                     result = "";
                 }
 
@@ -243,8 +330,7 @@ public class App {
                 } else {
                     location = setLocation(PC, true);
                 }
-
-
+                
             } else {
                 // System.out.println(trimmedInput);
                 if(input.equals("Data End")){
@@ -445,8 +531,12 @@ public class App {
     }
 
     // Return From Subroutine 
-    public static void RFS() {
+    public static void RFS(String immediate) {
+        int immed = Integer.parseInt(immediate);
+        Integer returnLocation = generalRegister.get(3);
 
+        generalRegister.set(0, immed);
+        setLocation(Integer.toString(returnLocation), false);
     }
 
     // Subtract One and Branch
@@ -472,7 +562,7 @@ public class App {
         int contentR = generalRegister.get(R);
         int EA = computeEA(address, ix, indirectBit);
 
-        if (generalRegister.get(R) >= 0) {
+        if (contentR >= 0) {
             // Set PC to the effective address
             setLocation(Integer.toString(EA), false);
         } else {
@@ -501,13 +591,33 @@ public class App {
     }
 
     // Add  Immediate to Register
-    public static void AIR() {
+    public static void AIR(String register, String immediate) {
+        int r = Integer.parseInt(register);
+        int immed = Integer.parseInt(immediate);
+        int contentR = generalRegister.get(r);
 
+        if (immed == 0) {
+            return;
+        } else if (contentR == 0){
+            generalRegister.set(r, immed);
+        } else if (contentR != 0) {
+            generalRegister.set(r, contentR + immed);
+        }
     }
 
     // Subtract  Immediate from Register
-    public static void SIR(){
+    public static void SIR(String register, String immediate){
+        int r = Integer.parseInt(register);
+        int immed = Integer.parseInt(immediate);
+        int contentR = generalRegister.get(r);
 
+        if (immed == 0) {
+            return;
+        } else if (contentR == 0){
+            generalRegister.set(r, -immed);
+        } else if (contentR != 0) {
+            generalRegister.set(r, contentR - immed);
+        }        
     }
 
     // Multiply Register by Register
@@ -559,10 +669,171 @@ public class App {
         generalRegister.set(rx + 1, generalRegister.get(rx) % generalRegister.get(ry)); // Remainder
     }   
 
+    // Test the Equality of Register and Register
+    public static void TRR(String registerX, String registerY) {
+        int rx = Integer.parseInt(registerX);
+        int ry = Integer.parseInt(registerY);
+
+        if (generalRegister.get(rx) == generalRegister.get(ry)) {
+            conditionCode.set(3, 1);
+        } else {
+            conditionCode.set(3, 0);
+        }
+    }
+
+    // Logical And of Register and Register
+    public static void AND(String registerX, String registerY) {
+        int rx = Integer.parseInt(registerX);
+        int ry = Integer.parseInt(registerY);
+        int contentRX = generalRegister.get(rx);
+        int contentRY = generalRegister.get(ry);
+
+        generalRegister.set(rx, contentRX & contentRY);
+    }
+
+    // Logical Or of Register and Register
+    public static void ORR(String registerX, String registerY) {
+        int rx = Integer.parseInt(registerX);
+        int ry = Integer.parseInt(registerY);
+        int contentRX = generalRegister.get(rx);
+        int contentRY = generalRegister.get(ry);
+        
+        generalRegister.set(rx, contentRX | contentRY);
+    }
+
+    // Logical Not of Register To Register
+    public static void NOT(String registerX) {
+        int rx = Integer.parseInt(registerX);
+        int contentRX = generalRegister.get(rx);
+        
+        generalRegister.set(rx, ~ contentRX);
+    }
+
+    // Shift Register by Count
+    public static void SRC(String register, String LorR, String AorL, String shiftCount) {
+        int r = Integer.parseInt(register);
+        int LR = Integer.parseInt(LorR);
+        int AL = Integer.parseInt(AorL);
+        int count = Integer.parseInt(shiftCount);
+        int contentR = generalRegister.get(r);
+
+        if (count == 0) {
+            return; // No shift occurs if count is 0
+        }
+
+        // Extracting the L/R and A/L from IX and I fields
+        int leftRight = (LR != 0) ? 1 : 0; // L/R
+        int arithmeticLogical = (AL != 0) ? 1 : 0; // A/L
+
+        // Applying the shift operation based on L/R and A/L
+        if (leftRight == 1) { // Left shift
+            if (arithmeticLogical == 1) { // Logical shift
+                contentR <<= count;
+                // generalRegister.set(r, contentR <<= count);
+            } else { // Arithmetic shift
+                int signBit = (contentR & 0x8000) >> 15;
+                contentR <<= count;
+                for (int i = 0; i < count; i++) {
+                    contentR = contentR |= signBit; // Propagate sign bit
+                }
+            }
+        } else { // Right shift
+            if (arithmeticLogical == 1) { // Logical shift
+                // int contentR = generalRegister.get(r);
+                contentR >>>= count;
+            } else { // Arithmetic shift
+                // int contentR = generalRegister.get(r);
+                int signBit = (contentR & 0x8000) >> 15;
+                contentR = (contentR & 0xFFFF) >>> count;
+                for (int i = 0; i < count; i++) {
+                    contentR = contentR |= signBit << 15; // Propagate sign bit
+                }
+            }
+        }
+        generalRegister.set(r, contentR);
+    }
+
+    // Rotate Register by Count
+    public static void RRC(String register, String LorR, String AorL, String shiftCount) {
+        int r = Integer.parseInt(register);
+        int LR = Integer.parseInt(LorR);
+        int AL = Integer.parseInt(AorL);
+        int count = Integer.parseInt(shiftCount);
+
+        if (count == 0) {
+            return; // No rotation occurs if count is 0
+        }
+
+        // Extracting the L/R and A/L fields
+        boolean leftRotate = (LR == 1);
+        boolean logicalRotate = (AL == 1);
+
+        int contentR = generalRegister.get(r);
+
+        // Perform rotation operation based on L/R and A/L
+        for (int i = 0; i < count; i++) {
+            if (leftRotate) {
+                int msb = (contentR & 0x8000) >> 15; // Extract the most significant bit
+                contentR <<= 1; // Left shift by 1
+                if (logicalRotate) {
+                    contentR |= msb; // Logical rotation: set LSB to previous MSB
+                } else {
+                    contentR |= msb ^ ((contentR & 0x4000) >> 14); // Arithmetic rotation: XOR MSB with 2nd MSB
+                }
+            } else {
+                int lsb = contentR & 0x1; // Extract the least significant bit
+                contentR >>>= 1; // Right shift by 1
+                if (logicalRotate) {
+                    contentR |= lsb << 15; // Logical rotation: set MSB to previous LSB
+                } else {
+                    contentR |= lsb << 15 ^ ((contentR & 0x4000) >> 14); // Arithmetic rotation: XOR LSB with 2nd LSB
+                }
+            }
+        }
+        // Update the register with the rotated value
+        generalRegister.set(r, contentR);
+    }
+
+    // Input Character To Register from Device
+    public static void IN(String register, String deviceID) {
+        // Choose the register where you want to store the character (e.g., register 0)
+        int r = Integer.parseInt(register);
+        int devid = Integer.parseInt(deviceID);
+
+        // Read a character from the device and store it into the selected register
+        char c = io.inputCharacterToRegister(generalRegister, r, devid);
+        generalRegister.set(r, number.charToInt(c));
+
+        // Display the result
+        System.out.println("Character stored in register " + r + ": " + generalRegister.get(r));
+    }
+
+    // Output Character to Device from Register
+    public static void OUT(String register, String deviceID) {
+        int r = Integer.parseInt(register);
+        int devid = Integer.parseInt(deviceID);
+
+        // Simulating output to device by printing the character
+        System.out.println("Output character from register " + register + " to device " + Integer.toString(devid) + ": " + Integer.toString(generalRegister.get(r)));
+    }
+
+    // Method to input character to register from device
+    public static void inputCharacterToRegister(int r, int devid) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Enter a character from device " + devid + ": ");
+        try {
+            char inputChar = (char)reader.read();
+            generalRegister.set(r, number.charToInt(inputChar));
+        } catch (IOException e) {
+            System.out.println("Error reading character from device " + devid + ": " + e.getMessage());
+        }
+    }
+    
+
     public static String setLocation(String newLocation, boolean increment) {
+        String location;
 
         PC = newLocation;
-        String location;
         location = number.decimalToBinary(PC);
         location = number.binaryToOctal(location);
         location = number.padBinary(location, 6);

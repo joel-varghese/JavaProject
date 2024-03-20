@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class InputOutput {
-    
+    private static Number number = new Number();
     public Map<String, String> fetchOpcodes(String file) {
         Map<String, String> opcodesMap = new HashMap<>();
 
@@ -188,5 +189,18 @@ public class InputOutput {
         System.out.println();
 
         return;
+    }
+
+        // Method to input character to register from device
+    public char inputCharacterToRegister(List<Integer> generalRegister, int r, int devid) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Enter a character from device " + devid + ": ");
+        try {
+            char inputChar = (char)reader.read();
+            return inputChar;
+        } catch (IOException e) {
+            System.out.println("Error reading character from device " + devid + ": " + e.getMessage());
+            return (char) -1;
+        }
     }
 }
