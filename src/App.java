@@ -25,7 +25,7 @@ public class App {
     private static List<Integer> generalRegister = new ArrayList<Integer>(Collections.nCopies(4, 0)); // R0, R1, R2, R3. For use w LDR
     private static List<Integer> indexRegister = new ArrayList<Integer>(Collections.nCopies(3, 0)); // X1, X2, X3. For use w LDX
     private static List<Integer> memoryAddress = new ArrayList<Integer>(Collections.nCopies(2048, 0)); // 2048
-    private static List<Integer> conditionCode = new ArrayList<Integer>(4);  // cc(0) = OVERFLOW, cc(1) = UNDERFLOW, cc(2) = DIVZERO, cc(3) = EQUALORNOT
+    private static List<Integer> conditionCode = new ArrayList<Integer>(Collections.nCopies(4, 0));  // cc(0) = OVERFLOW, cc(1) = UNDERFLOW, cc(2) = DIVZERO, cc(3) = EQUALORNOT
     public static Logger LOGGER = Logger.getLogger("");
     private static String PC = "";
 
