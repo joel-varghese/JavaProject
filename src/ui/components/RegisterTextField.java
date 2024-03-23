@@ -36,11 +36,10 @@ public class RegisterTextField extends JPanel {
 
     public char get() {
         try {
-
             if (textField.getText().startsWith("0x")) {
-                return (char) Integer.parseInt(textField.getText().substring(2), 16);
+                return (char) Integer.parseInt(textField.getText().substring(2), 2);
             } else {
-                return (char) Integer.parseInt(textField.getText(), 16);
+                return (char) Integer.parseInt(textField.getText(), 2);
             }
 
         } catch (NumberFormatException e) {
