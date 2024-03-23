@@ -23,11 +23,11 @@ public class OctalBinaryPanel extends GroupPanel {
 
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 0;
         add(octal, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         add(binary, gbc);
     }
     
