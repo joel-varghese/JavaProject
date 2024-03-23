@@ -5,15 +5,15 @@ import javax.swing.JPanel;
 import config.Config;
 import ui.Colors;
 
-public class GroupPanel extends JPanel {
+public class CachePanel extends JPanel {
 
-    public GroupPanel() {
+    public CachePanel() {
         super();
         setOpaque(false);
-        setBorder(javax.swing.BorderFactory.createEmptyBorder(Config.UI_MARGIN,
-                Config.UI_MARGIN * 2,
-                Config.UI_MARGIN * 2,
-                Config.UI_MARGIN * 2));
+        setBorder(javax.swing.BorderFactory.createEmptyBorder(Config.UI_MARGIN * 2,
+                Config.UI_MARGIN ,
+                Config.UI_MARGIN ,
+                Config.UI_MARGIN ));
     }
 
     @Override

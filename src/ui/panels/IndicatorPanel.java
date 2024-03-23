@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import config.Config;
 import ui.Colors;
 import ui.components.IndicatorGroup;
+import ui.panels.registers.CacheRegisterPanel;
 
 public class IndicatorPanel extends JPanel {
 
@@ -48,6 +49,8 @@ public class IndicatorPanel extends JPanel {
 
     // IPL Button to Load Listing file
     public JButton IPLButton;
+
+    public CacheRegisterPanel cacheGroup;
 
     public IndicatorPanel() {
         super();
@@ -89,6 +92,8 @@ public class IndicatorPanel extends JPanel {
 
         // Setup indicator for condition code register
         ccGroup = new IndicatorGroup(4, false, "CC");
+
+        cacheGroup = new CacheRegisterPanel();
 
         IPLButton = new JButton("IPL");
 
@@ -157,6 +162,11 @@ public class IndicatorPanel extends JPanel {
         gbc.gridheight = 2;
         add(IPLButton, gbc);
 
+        gbc.gridx = 8;
+        gbc.gridy = 0;
+        gbc.gridheight = 5;
+        gbc.weightx = 0.5;
+        add(cacheGroup, gbc);
     }
 
     @Override

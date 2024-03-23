@@ -10,7 +10,7 @@ import javax.swing.JComponent;
 
 public class Indicator extends JComponent {
 
-    public static final int SIZE = 20;
+    public static final int SIZE = 18;
 
     public static final int SPACING = SIZE / 2;
 
@@ -69,7 +69,7 @@ public class Indicator extends JComponent {
             g.setColor(Colors.INDICATOR_OFF);
         }
 
-        g.fillOval(SPACING / 2, (HEIGHT - SPACING) / 2, SIZE, SIZE);
+        g.fillOval(SPACING / 2 , (HEIGHT - SPACING) / 2, SIZE, SIZE);
     }
 
     @Override
