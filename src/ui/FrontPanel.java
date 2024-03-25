@@ -135,7 +135,19 @@ public class FrontPanel extends JFrame {
         });
 
         controlPanel.loadButton.addActionListener(e -> {
-            // computer.load();
+            
+            computer.processor.MAR = inputPanel.miscRegisterPanel.mar.get();
+
+            // Load from MAR to MBR
+            if (computer.processor.MAR != 0) {
+                computer.processor.MBR = computer.memory.read(inputPanel.miscRegisterPanel.mar.get());
+                updateIndicators();
+            } else {
+                computer.processor.MBR = 0;
+                updateIndicators();
+            }
+
+            
         });
 
         indicatorPanel.IPLButton.addActionListener(e -> {
@@ -170,12 +182,6 @@ public class FrontPanel extends JFrame {
         inputPanel.miscRegisterPanel.mar.textField.addActionListener(e -> {
             computer.processor.MAR = inputPanel.miscRegisterPanel.mar.get();
 
-            // Load MBR from ROM
-            // System.out.println("Debggie Girl: ");
-            // System.out.println(Integer.toString(inputPanel.miscRegisterPanel.mar.get()));
-            // System.out.println(Integer.toString((int) inputPanel.miscRegisterPanel.mar.get()));
-
-            computer.processor.MBR = computer.memory.read(inputPanel.miscRegisterPanel.mar.get());
             updateIndicators();
         });
 
