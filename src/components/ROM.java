@@ -40,12 +40,12 @@ public class ROM {
 
                 char address = (char) Integer.parseInt(parts[0], 8);
                 char data = (char) Integer.parseInt(parts[1], 8);
-
                 region.put(address, data);
             }
 
             br.close();
             LOGGER.info("Finished reading ROM file " + file.getName());
+
 
         } catch (IOException e) {
             LOGGER.warning("Failed to read ROM file " + file.getName() + ": " + e.getMessage());

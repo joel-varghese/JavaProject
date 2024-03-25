@@ -76,10 +76,10 @@ public class IndicatorPanel extends JPanel {
         r3Group = new IndicatorGroup(16, true, "R3");
 
         // Setup indiacator for memory buffer register
-        mbrGroup = new IndicatorGroup(16, true, "Memory Buffer");
+        mbrGroup = new IndicatorGroup(16, true, "Memory Buffer Register");
 
         // Setup indicator for memory address register
-        marGroup = new IndicatorGroup(12, false, "Memory Address");
+        marGroup = new IndicatorGroup(12, false, "Memory Address Register");
 
         // Setup indicator for memory fault register
         mfrGroup = new IndicatorGroup(4, false, "MFR");
