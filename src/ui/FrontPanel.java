@@ -134,6 +134,10 @@ public class FrontPanel extends JFrame {
             computer.run();
         });
 
+        controlPanel.loadButton.addActionListener(e -> {
+            // computer.load();
+        });
+
         indicatorPanel.IPLButton.addActionListener(e -> {
 
             computer.reset();
@@ -165,6 +169,13 @@ public class FrontPanel extends JFrame {
 
         inputPanel.miscRegisterPanel.mar.textField.addActionListener(e -> {
             computer.processor.MAR = inputPanel.miscRegisterPanel.mar.get();
+
+            // Load MBR from ROM
+            // System.out.println("Debggie Girl: ");
+            // System.out.println(Integer.toString(inputPanel.miscRegisterPanel.mar.get()));
+            // System.out.println(Integer.toString((int) inputPanel.miscRegisterPanel.mar.get()));
+
+            computer.processor.MBR = computer.memory.read(inputPanel.miscRegisterPanel.mar.get());
             updateIndicators();
         });
 

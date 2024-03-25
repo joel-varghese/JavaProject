@@ -9,10 +9,11 @@ import ui.components.GroupPanel;
 public class ControlPanel extends GroupPanel {
 
     public JButton runButton;
-
     public JButton stepBackButton;
-
     public JButton stepForwardButton;
+    public JButton loadButton;
+    public JButton storeButton;
+
 
     public ControlPanel() {
         super();
@@ -24,13 +25,23 @@ public class ControlPanel extends GroupPanel {
 
         runButton = new JButton("Run");
         stepForwardButton = new JButton(">>");
+        loadButton = new JButton("Load");
+        storeButton = new JButton("Store");
 
-        gbc.gridx = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(loadButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(storeButton, gbc);
+
+        gbc.gridx = 1;
         gbc.gridy = 0;
         add(runButton, gbc);
 
-        gbc.gridx = 3;
-        gbc.gridy = 0;
+        gbc.gridx = 1;
+        gbc.gridy = 1;
         add(stepForwardButton, gbc);
 
     }

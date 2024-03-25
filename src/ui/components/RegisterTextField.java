@@ -55,5 +55,4 @@ public class RegisterTextField extends JPanel {
     public void set(char value) {
         textField.setText(String.format("00%s",Integer.toBinaryString((int) value)));
     }
-
 }
