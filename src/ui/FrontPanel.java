@@ -141,6 +141,7 @@ public class FrontPanel extends JFrame {
             // Load from MAR to MBR
             if (computer.processor.MAR != 0) {
                 computer.processor.MBR = computer.memory.read(computer.processor.MAR);
+                inputPanel.miscRegisterPanel.mbr.set(computer.processor.MBR);
                 updateIndicators();
             } else {
                 computer.processor.MBR = 0;
