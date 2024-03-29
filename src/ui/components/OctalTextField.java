@@ -92,8 +92,6 @@ public class OctalTextField extends JPanel {
         
         // Update the other text field with the new value
         // Here, you can replace "otherTextField" with the reference to the other OctalBinaryTextField
-        // Assuming you have another instance named otherTextField
-        // otherTextField.set(value);
         otherTextField.set(intValue);
     }
 

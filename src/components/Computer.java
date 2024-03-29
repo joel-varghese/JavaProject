@@ -25,6 +25,9 @@ public class Computer {
     // ROM files that have been loaded into memory
     public List<ROM> roms;
 
+    // Cache
+    public SimpleCache<Character, Character> cache;
+
     /**
      * Creates a new minicomputer with a memory and processor.
      */
@@ -33,6 +36,7 @@ public class Computer {
         ioBus = new IOBus();
         processor = new Processor(memory, ioBus);
         roms = new java.util.ArrayList<ROM>();
+        cache = new SimpleCache<>(128); // 16 x 8
     }
 
     /**
@@ -59,6 +63,10 @@ public class Computer {
         for (char address : rom.read().keySet()) {
             memory.privilegedWrite(address, rom.read().get(address));
         }
+    }
+
+    public void loadCache(SimpleCache<Character, Character> cache) {
+        
     }
 
     /**

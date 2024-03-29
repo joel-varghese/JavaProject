@@ -9,6 +9,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import components.Computer;
@@ -18,6 +20,7 @@ import ui.components.FrontPanelMenu;
 import ui.panels.ControlPanel;
 import ui.panels.IndicatorPanel;
 import ui.panels.InputPanel;
+import ui.panels.registers.*;
 import ui.windows.ConsoleWindow;
 import util.ScreenUtil;
 
@@ -33,6 +36,9 @@ public class FrontPanel extends JFrame {
 
     // Panel containing all text inputs for settable registers
     public InputPanel inputPanel = new InputPanel();
+
+    // Panel containing all cache registers
+    public CacheRegisterPanel cacheRegisterPanel = new CacheRegisterPanel();
 
     // Menu bar for the front panel
     public FrontPanelMenu menu = new FrontPanelMenu();
@@ -147,7 +153,7 @@ public class FrontPanel extends JFrame {
                 computer.processor.MBR = 0;
                 updateIndicators();
             }
-            // updateIndicators();
+
         });
 
         controlPanel.storeButton.addActionListener(e -> {
@@ -161,7 +167,7 @@ public class FrontPanel extends JFrame {
         });
 
         indicatorPanel.IPLButton.addActionListener(e -> {
-
+            System.out.println("LEmon");
             computer.reset();
             registerListeners();
             JOptionPane.showMessageDialog(this, "Minicomputer reset successfully!", "Success",
@@ -176,6 +182,12 @@ public class FrontPanel extends JFrame {
                 JOptionPane.INFORMATION_MESSAGE);
             }
 
+        });
+
+        indicatorPanel.cacheGroup.submitCacheButton.addActionListener(e -> {
+            System.out.println("Lemon: ");
+            System.out.println("Lemon: " + indicatorPanel.cacheGroup.console.get());
+            indicatorPanel.cacheGroup.cache.set((char) 110);
         });
     }
 
@@ -234,6 +246,7 @@ public class FrontPanel extends JFrame {
             computer.processor.X3 = inputPanel.indexRegisterPanel.x3.get();
             updateIndicators();
         });
+
     }
 
     public void updateIndicators() {
@@ -270,4 +283,22 @@ public class FrontPanel extends JFrame {
         inputPanel.indexRegisterPanel.x3.set(computer.processor.X3);
     }
 
+        // Custom DocumentListener implementation for demonstration
+    // private static class CustomDocumentListener implements javax.swing.event.DocumentListener {
+    //     @Override
+    //     public void insertUpdate(DocumentEvent e) {
+    //         System.out.println("Inserted text: " + e.getDocument().getText(0, e.getDocument().getLength()));
+    //     }
+    
+    //     @Override
+    //     public void removeUpdate(DocumentEvent e) {
+    //         System.out.println("Removed text: " + e.getDocument().getText(0, e.getDocument().getLength()));
+    //     }
+    
+    //     @Override
+    //     public void changedUpdate(DocumentEvent e) {
+    //         // Not used for plain text components
+    //         System.out.println("Updated text: "  + e.getDocument().getText(0, e.getDocument().getLength()));
+    //     }
+    // }
 }
