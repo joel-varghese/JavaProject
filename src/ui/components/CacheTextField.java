@@ -4,8 +4,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -39,34 +37,6 @@ public class CacheTextField extends JPanel {
         gbc.gridy = 1;
         add(this.textArea, gbc);
 
-        // // Create a document listener to listen for changes in the text area
-        // textArea.getDocument().addDocumentListener(new DocumentListener() {
-        //     @Override
-        //     public void insertUpdate(DocumentEvent e) {
-        //         // Action to perform when text is inserted
-        //         textChanged();
-        //     }
-
-        //     @Override
-        //     public void removeUpdate(DocumentEvent e) {
-        //         // Action to perform when text is removed
-        //         textChanged();
-        //     }
-
-        //     @Override
-        //     public void changedUpdate(DocumentEvent e) {
-        //         // Not used for plain text components
-        //     }
-            
-        //     // Method to handle text changes
-        //     private void textChanged() {
-        //         String newText = textArea.getText();
-        //         System.out.println("Changed text: " + newText);
-        //         // Do something with the changed text
-        //         // textArea.setText(newText);
-        //     }
-        // });
-
     }
 
     // Getter method to access the JTextArea from outside
@@ -76,17 +46,14 @@ public class CacheTextField extends JPanel {
 
     public char get() {
         try {
-
             if (textArea.getText().startsWith("0x")) {
                 return (char) Integer.parseInt(textArea.getText().substring(2), 8);
             } else {
                 return (char) Integer.parseInt(textArea.getText(), 8);
             }
-
         } catch (NumberFormatException e) {
             return 0;
         }
-
     }
 
     /**

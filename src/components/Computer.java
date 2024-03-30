@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import components.cpu.Processor;
 import components.io.IOBus;
+import components.Cache;
 
 public class Computer {
 
@@ -96,29 +97,25 @@ public class Computer {
         processor.step();
     }
 
+    public String fetchCacheContent(char address) {
+        StringBuilder content = new StringBuilder();
+
+        content.append(Cache.padOctal(Integer.toString(address, 8), 6));
+        if (!cache.containsKey(address)) {
+            loadCache(address);
+        } 
+        content.append(" " + Cache.padOctal(Integer.toString(cache.get(address), 8), 6));
+
+        return content.toString();
+    }
+
+
     public String loadCache(char address) {
-
-        
-
-        // int modulo = address % 8;
-        // int startingPoint = address - modulo;
-        // char currAddress = (char) startingPoint;
-        // StringBuilder displayAddresses = new StringBuilder();
-
-        // displayAddresses.append(padOctal(Integer.toString(currAddress, 8), 4));
-
-        // for (int i = 0; i < 8; i++) {
-        //     cache.put(currAddress, memory.read(currAddress));
-        //     // displayAddresses = displayAddresses + " " + Integer.toString(currAddress);
-        //     displayAddresses.append(" " + padOctal(Integer.toString(currAddress, 8), 4));
-        //     currAddress += 1;
-
-        // }
         cache.putLine(address, memory);
-        cache.printAll();
 
         return cache.displayCacheAddresses();
     }
+
 
 
 }
