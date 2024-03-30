@@ -26,7 +26,7 @@ public class Computer {
     public List<ROM> roms;
 
     // Cache
-    public SimpleCache<Character, Character> cache;
+    public Cache<Character, Character> cache;
 
     /**
      * Creates a new minicomputer with a memory and processor.
@@ -36,7 +36,7 @@ public class Computer {
         ioBus = new IOBus();
         processor = new Processor(memory, ioBus);
         roms = new java.util.ArrayList<ROM>();
-        cache = new SimpleCache<>(128); // 16 x 8
+        cache = new Cache<>(128); // 16 x 8
     }
 
     /**
@@ -65,9 +65,6 @@ public class Computer {
         }
     }
 
-    public void loadCache(SimpleCache<Character, Character> cache) {
-        
-    }
 
     /**
      * Resets the minicomputer by clearing the memory and processor,
@@ -99,6 +96,29 @@ public class Computer {
         processor.step();
     }
 
+    public String loadCache(char address) {
+
+        
+
+        // int modulo = address % 8;
+        // int startingPoint = address - modulo;
+        // char currAddress = (char) startingPoint;
+        // StringBuilder displayAddresses = new StringBuilder();
+
+        // displayAddresses.append(padOctal(Integer.toString(currAddress, 8), 4));
+
+        // for (int i = 0; i < 8; i++) {
+        //     cache.put(currAddress, memory.read(currAddress));
+        //     // displayAddresses = displayAddresses + " " + Integer.toString(currAddress);
+        //     displayAddresses.append(" " + padOctal(Integer.toString(currAddress, 8), 4));
+        //     currAddress += 1;
+
+        // }
+        cache.putLine(address, memory);
+        cache.printAll();
+
+        return cache.displayCacheAddresses();
+    }
 
 
 }
