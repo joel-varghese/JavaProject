@@ -186,13 +186,10 @@ public class FrontPanel extends JFrame {
 
         indicatorPanel.cacheGroup.submitCacheButton.addActionListener(e -> {
             char address = indicatorPanel.cacheGroup.console.get();
-            System.out.println("Front Panel cache: ");
-            System.out.println(Integer.toString(address));
-            String displayAddresses = computer.loadCache(address);
-            System.out.println("Print All cache: ");
-            computer.cache.printAll();
-
+            String addressContent = computer.fetchCacheContent(address);
+            String displayAddresses = computer.cache.displayCacheAddresses();
             indicatorPanel.cacheGroup.cache.textArea.setText(displayAddresses);
+            indicatorPanel.cacheGroup.printer.textArea.setText(addressContent);
         });
     }
 
