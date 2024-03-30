@@ -60,33 +60,16 @@ public class Cache<K, V> {
             }
         }
         char[] addressRange = generateAddressRange(address);
-        // StringBuilder displayAddresses = new StringBuilder();
-        // displayAddresses.append(padOctal(Integer.toString(currAddress, 8), 4));
 
         for (int i = addressRange.length - 1; i >= 0; i--) {
             char currAddress = addressRange[i];
             cache.put(currAddress, memory.read(currAddress));
-            // displayAddresses = displayAddresses + " " + Integer.toString(currAddress);
-            // displayAddresses.append(" " + padOctal(Integer.toString(currAddress, 8), 4));
             accessOrder.addFirst(currAddress);
             currAddress += 1;
         }
         return ;
     }
 
-    // public synchronized void put(Character key, Character value) {
-    //     // if (cache.containsKey(key)) {
-    //     //     accessOrder.remove(key);
-    //     if (cache.size() >= capacity) {
-    //         for (int i = 0; i < 8; i++) {
-    //             Character leastRecentlyUsed = accessOrder.removeLast();
-    //             cache.remove(leastRecentlyUsed);
-    //         }
-    //     }
-            
-    //     cache.put(key, value);
-    //     accessOrder.addFirst(key);
-    // }
 
     public char[] generateAddressRange(char address) {
         char[] addressRange = new char[8];
@@ -138,28 +121,21 @@ public class Cache<K, V> {
     public String displayCacheAddresses() {
         int count = 0;
         StringBuilder cacheDisplay = new StringBuilder();
-        // for (Map.Entry<Character, Character> entry : cache.entrySet()) {
-        //     cacheDisplay.append(" " +Integer.toString(entry.getKey(), 8));
-        //     count++;
-        //     if (count % 8 == 0) {
-        //         cacheDisplay.append("\n");
-        //     }
-        // }
+
         Iterator it = accessOrder.iterator(); 
 
-        // for (int i = 0; i < accessOrder.size(); i++) { 
-        //     cacheDisplay.append("\t" + Integer.toString(accessOrder.get(i),8)); 
-        //     if (i % 8 == 0) {
-        //         cacheDisplay.append("\n");
-        //     }
-        // } 
 
         while (it.hasNext()) {
-            cacheDisplay.append(" " + padOctal(Integer.toString((char) it.next(),8), 4)); 
-            count++;
+            String paddedAddress = padOctal(Integer.toString((char) it.next(),8), 4);
             if (count % 8 == 0) {
-                cacheDisplay.append("\n");
+                if (count != 0) {
+                    cacheDisplay.append("\n");
+                }
+                String header = paddedAddress.substring(0, 3);
+                cacheDisplay.append(header);
             }
+            cacheDisplay.append(" " + paddedAddress); 
+            count++;
         }
         return cacheDisplay.toString();
 

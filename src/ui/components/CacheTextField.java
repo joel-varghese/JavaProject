@@ -21,7 +21,7 @@ public class CacheTextField extends JPanel {
 
 
         this.label = new JLabel(label);
-        this.textArea = new JTextArea(rows,30);
+        this.textArea = new JTextArea(rows,40);
         this.textArea.setLineWrap(true);
         this.textArea.setWrapStyleWord(true);
         this.textArea.setEditable(true);
