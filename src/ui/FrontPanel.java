@@ -185,9 +185,14 @@ public class FrontPanel extends JFrame {
         });
 
         indicatorPanel.cacheGroup.submitCacheButton.addActionListener(e -> {
-            System.out.println("Lemon: ");
-            System.out.println("Lemon: " + indicatorPanel.cacheGroup.console.get());
-            indicatorPanel.cacheGroup.cache.set((char) 110);
+            char address = indicatorPanel.cacheGroup.console.get();
+            System.out.println("Front Panel cache: ");
+            System.out.println(Integer.toString(address));
+            String displayAddresses = computer.loadCache(address);
+            System.out.println("Print All cache: ");
+            computer.cache.printAll();
+
+            indicatorPanel.cacheGroup.cache.textArea.setText(displayAddresses);
         });
     }
 

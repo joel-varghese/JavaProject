@@ -78,9 +78,9 @@ public class CacheTextField extends JPanel {
         try {
 
             if (textArea.getText().startsWith("0x")) {
-                return (char) Integer.parseInt(textArea.getText().substring(2), 16);
+                return (char) Integer.parseInt(textArea.getText().substring(2), 8);
             } else {
-                return (char) Integer.parseInt(textArea.getText(), 16);
+                return (char) Integer.parseInt(textArea.getText(), 8);
             }
 
         } catch (NumberFormatException e) {
