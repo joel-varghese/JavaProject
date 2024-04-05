@@ -26,6 +26,9 @@ public class Computer {
     // ROM files that have been loaded into memory
     public List<ROM> roms;
 
+    // Store changes Address
+    public String displaySet;
+
     // Cache
     public Cache<Character, Character> cache;
 
@@ -34,6 +37,7 @@ public class Computer {
      */
     public Computer() {
         memory = new Memory();
+        displaySet = "";
         ioBus = new IOBus();
         processor = new Processor(memory, ioBus);
         roms = new java.util.ArrayList<ROM>();
@@ -94,6 +98,7 @@ public class Computer {
      */
     public void step() {
         LOGGER.info("Beginning STEP execution mode");
+        fetchCacheContent(processor.disAddress);
         processor.step();
     }
 
@@ -106,6 +111,7 @@ public class Computer {
         } 
         content.append(" " + Cache.padOctal(Integer.toString(cache.get(address), 8), 6));
 
+        displaySet = content.toString();
         return content.toString();
     }
 

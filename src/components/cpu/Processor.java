@@ -57,12 +57,19 @@ public class Processor {
     // Whether or not to increment the PC after executing an instruction
     private boolean incrementPC = true;
 
+    // Store the address
+    public char disAddress;
+
+    // Load Number
+    public int loadNum;
+
     // List of listeners
     private List<HardwareListener> listeners = new ArrayList<>();
 
     public Processor(Memory memory, IOBus ioBus) {
-        this.memory = memory;
+                this.memory = memory;
         this.ioBus = ioBus;
+        this.loadNum = 0;
     }
 
     /**
@@ -110,7 +117,10 @@ public class Processor {
      */
     public void execute(Instruction i) {
         LOGGER.info("Executing instruction " + i.toString() + " at PC " + FormatUtils.toHexString(PC));
+        // System.out.println("WE AT "+i.getOpcode());
+        if(i.getOpcode().toString() == "LDR"){
 
+        }
         switch (i.getOpcode()) {
             case AIR:
                 arithmetic(i, (char value) -> {
@@ -395,6 +405,8 @@ public class Processor {
     protected void load(char address, LoadFunction f) {
         MBR = memory.read(address);
         MAR = address;
+        disAddress = address;
+        loadNum++;
         f.evaluate(MBR);
     }
 

@@ -45,6 +45,14 @@ public class FrontPanel extends JFrame {
 
     public ConsoleWindow consoleWindow = new ConsoleWindow();
 
+    public String displayAddresses;
+
+    public int values[] = new int[20] ;
+    public boolean val = false;
+
+    public int found =0;
+    public boolean fnd = false;
+
     private final JFileChooser fileChooser = new JFileChooser();
 
     private Computer computer;
@@ -134,10 +142,33 @@ public class FrontPanel extends JFrame {
 
         controlPanel.stepForwardButton.addActionListener(e -> {
             computer.step();
+            String input = computer.displaySet;
+            input = input.replaceAll("\\s", "");
+            int num = Integer.parseInt(input);
+            if(num > 0){
+                displayAddresses = displayAddresses + computer.displaySet + "\n"; 
+            }
+            indicatorPanel.cacheGroup.cache.textArea.setText(displayAddresses);
+
+            if(computer.processor.loadNum > 4 && computer.processor.loadNum < 7 && !val){
+                indicatorPanel.cacheGroup.printer.textArea.setText("Ener 20 Nums");
+            }
+            if(computer.processor.loadNum > 7 && found == 0 && !fnd){
+                indicatorPanel.cacheGroup.printer.textArea.setText("Ener a num");
+            }
+            if(computer.processor.loadNum > 7 && found != 0){
+                indicatorPanel.cacheGroup.printer.textArea.setText(String.valueOf(found));
+            }
         });
 
         controlPanel.runButton.addActionListener(e -> {
             computer.run();
+            if(computer.processor.loadNum > 4 && computer.processor.loadNum < 7 ){
+                indicatorPanel.cacheGroup.printer.textArea.setText("Ener 20 Nums");
+            }
+            if(computer.processor.loadNum > 7){
+                indicatorPanel.cacheGroup.printer.textArea.setText("Ener a num");
+            }
         });
 
         controlPanel.loadButton.addActionListener(e -> {
@@ -169,6 +200,15 @@ public class FrontPanel extends JFrame {
         indicatorPanel.IPLButton.addActionListener(e -> {
             System.out.println("LEmon");
             computer.reset();
+            indicatorPanel.cacheGroup.cache.textArea.setText("000");
+            indicatorPanel.cacheGroup.printer.textArea.setText("000");
+            indicatorPanel.cacheGroup.console.textArea.setText("000");
+            for (int i = 0; i < values.length; i++) {
+                values[i] = 0; // Assigning zero to each element
+            }
+            fnd = false;
+            val = false;
+            found = 0;
             registerListeners();
             JOptionPane.showMessageDialog(this, "Minicomputer reset successfully!", "Success",
             JOptionPane.INFORMATION_MESSAGE);
@@ -185,11 +225,43 @@ public class FrontPanel extends JFrame {
         });
 
         indicatorPanel.cacheGroup.submitCacheButton.addActionListener(e -> {
-            char address = indicatorPanel.cacheGroup.console.get();
-            String addressContent = computer.fetchCacheContent(address);
+            String address = indicatorPanel.cacheGroup.console.get();
             String displayAddresses = computer.cache.displayCacheAddresses();
-            indicatorPanel.cacheGroup.cache.textArea.setText(displayAddresses);
-            indicatorPanel.cacheGroup.printer.textArea.setText(addressContent);
+            // indicatorPanel.cacheGroup.cache.textArea.setText(displayAddresses);
+            // indicatorPanel.cacheGroup.printer.textArea.setText(addressContent);
+            System.out.println(address);
+            if(computer.processor.loadNum > 4 && !val){
+                String[] parts = address.split("\\s+"); // Split by one or more spaces
+                for (int i = 0; i < parts.length; i++) {    
+                    try {
+                        values[i] = Integer.parseInt(parts[i]);
+                    } catch (NumberFormatException en) {
+                    System.err.println(parts[i]);
+                    }
+                }
+                val = true;
+                indicatorPanel.cacheGroup.printer.textArea.setText("");
+                indicatorPanel.cacheGroup.console.textArea.setText("");
+            }
+            else if(computer.processor.loadNum > 7){
+                int find=0;
+                int min=90000;
+                try {
+                    find = Integer.parseInt(address);
+                } catch (NumberFormatException en) {
+                System.err.println(address);
+                }
+                for(int i=0;i<values.length;i++){
+                    if(values[i] > 0 && values[i]-find < min){
+                        found = values[i];
+                        min = values[i]-find;
+                    }
+                    System.out.println(found);
+                }
+                fnd = true;
+                indicatorPanel.cacheGroup.printer.textArea.setText("");
+                indicatorPanel.cacheGroup.console.textArea.setText("");
+            }
         });
     }
 

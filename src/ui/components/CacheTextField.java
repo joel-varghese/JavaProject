@@ -44,15 +44,15 @@ public class CacheTextField extends JPanel {
         return textArea;
     }
 
-    public char get() {
+    public String get() {
         try {
             if (textArea.getText().startsWith("0x")) {
-                return (char) Integer.parseInt(textArea.getText().substring(2), 8);
+                return textArea.getText();
             } else {
-                return (char) Integer.parseInt(textArea.getText(), 8);
+                return textArea.getText();
             }
         } catch (NumberFormatException e) {
-            return 0;
+            return "";
         }
     }
 
