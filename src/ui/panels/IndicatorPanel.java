@@ -12,6 +12,8 @@ import config.Config;
 import ui.Colors;
 import ui.components.IndicatorGroup;
 import ui.panels.registers.CacheRegisterPanel;
+import ui.panels.registers.DeviceRegisterPanel;
+
 
 public class IndicatorPanel extends JPanel {
 
@@ -51,6 +53,8 @@ public class IndicatorPanel extends JPanel {
     public JButton IPLButton;
 
     public CacheRegisterPanel cacheGroup;
+
+    public DeviceRegisterPanel deviceGroup;
 
     public IndicatorPanel() {
         super();
@@ -94,6 +98,8 @@ public class IndicatorPanel extends JPanel {
         ccGroup = new IndicatorGroup(4, false, "CC");
 
         cacheGroup = new CacheRegisterPanel();
+
+        deviceGroup = new DeviceRegisterPanel();
 
         IPLButton = new JButton("IPL");
 
@@ -167,6 +173,12 @@ public class IndicatorPanel extends JPanel {
         gbc.gridheight = 5;
         gbc.weightx = 0.5;
         add(cacheGroup, gbc);
+
+        gbc.gridx = 8;
+        gbc.gridy = 5;
+        gbc.gridheight = 5;
+        gbc.weightx = 0.5;
+        add(deviceGroup, gbc);
     }
 
     @Override

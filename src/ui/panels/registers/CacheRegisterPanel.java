@@ -22,7 +22,7 @@ public class CacheRegisterPanel extends CachePanel {
 
         cache = new CacheTextField("Cache Content",16);
 
-        printer = new CacheTextField("Printer",10);
+        printer = new CacheTextField("Printer", 2);
 
         console = new CacheTextField("Console Input",2);
 

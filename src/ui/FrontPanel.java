@@ -40,6 +40,9 @@ public class FrontPanel extends JFrame {
     // Panel containing all cache registers
     public CacheRegisterPanel cacheRegisterPanel = new CacheRegisterPanel();
 
+    // Panel containing the paragraph and device
+    public DeviceRegisterPanel deviceRegisterPanel = new DeviceRegisterPanel();
+
     // Menu bar for the front panel
     public FrontPanelMenu menu = new FrontPanelMenu();
 
