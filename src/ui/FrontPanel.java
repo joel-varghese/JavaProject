@@ -167,7 +167,6 @@ public class FrontPanel extends JFrame {
         });
 
         indicatorPanel.IPLButton.addActionListener(e -> {
-            System.out.println("LEmon");
             computer.reset();
             registerListeners();
             JOptionPane.showMessageDialog(this, "Minicomputer reset successfully!", "Success",
@@ -181,7 +180,6 @@ public class FrontPanel extends JFrame {
                 JOptionPane.showMessageDialog(this, "ROM loaded successfully!", "Success",
                 JOptionPane.INFORMATION_MESSAGE);
             }
-
         });
 
         indicatorPanel.cacheGroup.submitCacheButton.addActionListener(e -> {

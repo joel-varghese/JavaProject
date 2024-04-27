@@ -20,14 +20,6 @@ public class Cache<K, V> {
         return value;
     }
 
-    // public synchronized Character get(Character key) {
-    //     Character value = cache.get(key);
-    //     if (value != null) {
-    //         accessOrder.remove(key);
-    //         accessOrder.addFirst(key);
-    //     }
-    //     return value;
-    // }
 
     public synchronized boolean containsKey(Character key) {
         return cache.containsKey(key);
@@ -53,6 +45,7 @@ public class Cache<K, V> {
             return;
 
         } else if (cache.size() >= capacity) {
+            // 8 least recently used addresses are removed
             for (int i = 0; i < 8; i++) {
                 char leastRecentlyUsed = (char) accessOrder.removeLast();
                 cache.remove(leastRecentlyUsed);
@@ -60,6 +53,7 @@ public class Cache<K, V> {
         }
         char[] addressRange = generateAddressRange(address);
 
+        // Adding new addresses
         for (int i = addressRange.length - 1; i >= 0; i--) {
             char currentAddress = addressRange[i];
             cache.put(currentAddress, memory.read(currentAddress));

@@ -99,23 +99,22 @@ public class Computer {
 
     public String fetchCacheContent(char address) {
         StringBuilder content = new StringBuilder();
-
+        
         content.append(Cache.padOctal(Integer.toString(address, 8), 6));
+
+        // If address is not in cache - "Miss"
         if (!cache.containsKey(address)) {
+            // Search for address in memory, load address to cache
             loadCache(address);
         } 
-        content.append(" " + Cache.padOctal(Integer.toString(cache.get(address), 8), 6));
 
+        // Else if address is already in cache - "Hit"
+        content.append(" " + Cache.padOctal(Integer.toString(cache.get(address), 8), 6));
         return content.toString();
     }
 
-
     public String loadCache(char address) {
         cache.putLine(address, memory);
-
         return cache.displayCacheAddresses();
     }
-
-
-
 }
