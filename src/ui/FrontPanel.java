@@ -66,6 +66,7 @@ public class FrontPanel extends JFrame {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setFileFilter(new FileNameExtensionFilter("ROM (.txt)", Config.ROM_FILE_EXTENSION));
 
+
         registerListeners();
         registerActionListeners();
         registerKeyListeners();
@@ -194,8 +195,17 @@ public class FrontPanel extends JFrame {
         });
 
         indicatorPanel.deviceGroup.submitDeviceButton.addActionListener(e -> {
+            // Display 6 sentence paragraph
             String paragraphText = computer.fetchParagraphContent();
             indicatorPanel.deviceGroup.paragraphContent.textArea.setText(paragraphText);
+
+            // Input user word
+            String userWord = indicatorPanel.deviceGroup.deviceInput.getString();
+            
+
+            // Output the word, the sentence number, and the word number in the sentence.
+            String displaySearchResult = computer.searchUserWord(userWord);
+            indicatorPanel.deviceGroup.deviceOutput.textArea.setText(displaySearchResult);
         });
     }
 

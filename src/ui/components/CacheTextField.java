@@ -56,6 +56,11 @@ public class CacheTextField extends JPanel {
         }
     }
 
+    public String getString() {
+
+        return textArea.getText();
+    }
+
     /**
      * Sets the value of the register text field.
      * 

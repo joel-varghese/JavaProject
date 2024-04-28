@@ -150,4 +150,37 @@ public class Computer {
 
         return content.toString();
     }
+
+    public String searchUserWord(String userWord) {
+        StringBuilder content = new StringBuilder();
+        StringBuilder memoryWord = new StringBuilder();
+        char memoryCounter = Paragraph.startAddress;
+        int wordIndex = 0;
+        boolean found = false;
+
+        while (memoryCounter <= Paragraph.endAddress && !found) {
+            
+            if (memory.read(memoryCounter) == userWord.charAt(wordIndex)) {
+                for (int i = 0; i < userWord.length(); i++) {
+                    memoryWord.append(memory.read(memoryCounter));
+                    memoryCounter++;
+                }
+            }
+
+            if (userWord.equals(memoryWord.toString())) {
+                found = true;
+            } else {
+                memoryWord = new StringBuilder();
+            }
+
+            memoryCounter++;
+        }
+
+        if (found) {
+            return "It's in the Memory";
+        } else {
+            return "It's NOT in the Memory";
+        }
+
+    }
 }

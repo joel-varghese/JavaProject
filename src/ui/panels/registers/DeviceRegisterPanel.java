@@ -22,7 +22,7 @@ public class DeviceRegisterPanel extends CachePanel {
 
         paragraphContent = new CacheTextField("Paragraph Content",6);
 
-        deviceOutput = new CacheTextField("Device Output", 2);
+        deviceOutput = new CacheTextField("Device Output", 3);
 
         deviceInput = new CacheTextField("Device Input",2);
 
