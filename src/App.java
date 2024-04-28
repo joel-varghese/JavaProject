@@ -818,7 +818,8 @@ public class App {
         int devid = Integer.parseInt(deviceID);
 
         // Simulating output to device by printing the character
-        System.out.println("Output character from register " + register + " to device " + Integer.toString(devid) + ": " + Integer.toString(generalRegister.get(r)));
+        System.out.println("Output character from register " + register + " to device " 
+                    + Integer.toString(devid) + ": " + Integer.toString(generalRegister.get(r)));
     }
 
     // Method to input character to register from device
