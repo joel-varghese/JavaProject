@@ -192,6 +192,11 @@ public class FrontPanel extends JFrame {
             indicatorPanel.cacheGroup.cache.textArea.setText(displayAddresses);
             indicatorPanel.cacheGroup.printer.textArea.setText(addressContent);
         });
+
+        indicatorPanel.deviceGroup.submitDeviceButton.addActionListener(e -> {
+            String paragraphText = computer.fetchParagraphContent();
+            indicatorPanel.deviceGroup.paragraphContent.textArea.setText(paragraphText);
+        });
     }
 
     /**

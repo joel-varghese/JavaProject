@@ -2,6 +2,8 @@ package components;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.io.File;
+
 
 import components.cpu.Processor;
 import components.io.IOBus;
@@ -26,6 +28,9 @@ public class Computer {
     // ROM files that have been loaded into memory
     public List<ROM> roms;
 
+    // Paragraph files that have been loaded into memory
+    public List<Paragraph> paragraphs;
+
     // Cache
     public Cache<Character, Character> cache;
 
@@ -37,7 +42,15 @@ public class Computer {
         ioBus = new IOBus();
         processor = new Processor(memory, ioBus);
         roms = new java.util.ArrayList<ROM>();
+        paragraphs = new java.util.ArrayList<Paragraph>();
         cache = new Cache<>(128); // 16 x 8
+    }
+
+    public Computer(ROM ipl, Paragraph paragraph) {
+        this();
+        this.ipl = ipl;
+        loadROM(ipl);
+        loadParagraph(paragraph);
     }
 
     /**
@@ -66,6 +79,14 @@ public class Computer {
         }
     }
 
+    public void loadParagraph(Paragraph paragraph) {
+        LOGGER.info("Loading paragraph file " + paragraph.getPath());
+        paragraphs.add(paragraph);
+
+        for (char address : paragraph.read().keySet()) {
+            memory.privilegedWrite(address, paragraph.read().get(address));
+        }
+    }
 
     /**
      * Resets the minicomputer by clearing the memory and processor,
@@ -116,5 +137,17 @@ public class Computer {
     public String loadCache(char address) {
         cache.putLine(address, memory);
         return cache.displayCacheAddresses();
+    }
+
+    public String fetchParagraphContent() {
+        StringBuilder content = new StringBuilder();
+        char memoryCounter = Paragraph.startAddress;
+
+        while (memoryCounter <= Paragraph.endAddress) {
+            content.append(memory.read(memoryCounter));
+            memoryCounter++;
+        }
+
+        return content.toString();
     }
 }

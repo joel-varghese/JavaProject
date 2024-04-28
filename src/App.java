@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 
 import components.Computer;
 import components.ROM;
+import components.Paragraph;
 import ui.FrontPanel;
 
 public class App {
@@ -57,7 +58,10 @@ public class App {
 
 
         File iplFile = new File(Config.ROM_IPL_FILENAME);
-        if (iplFile.exists()) {
+        File paragraphFile = new File(Config.PARAGRAPH_FILENAME);
+        if (iplFile.exists() && paragraphFile.exists()) {
+            computer = new Computer(new ROM(iplFile), new Paragraph(paragraphFile));
+        } else if (iplFile.exists()) {
             computer = new Computer(new ROM(iplFile));
         } else {
             computer = new Computer();

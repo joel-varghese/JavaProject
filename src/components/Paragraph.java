@@ -8,14 +8,19 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.HashMap;
 
-public class ROM {
+public class Paragraph {
 
     private static final Logger LOGGER = Logger.getLogger(Computer.class.getName());
 
-    // The ROM file
+    public static char startAddress;
+
+    public static char endAddress;
+
+    public static String addressCounter;
+
     private File file;
 
-    public ROM(File file) {
+    public Paragraph(File file) {
         this.file = file;
     }
 
@@ -28,23 +33,26 @@ public class ROM {
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                String input = line.replaceAll("\\s+", " ");
-                String[] parts = input.split(" ");
-
-                if (parts.length != 2) {
-                    continue;
-                }
-
-                char address = (char) Integer.parseInt(parts[0], 8);
-                char data = (char) Integer.parseInt(parts[1], 8);
+            addressCounter = "1000";
+            startAddress = (char) Integer.parseInt(addressCounter, 8);
+            int character;
+            while ((character = br.read()) != -1) {
+                char address = (char) Integer.parseInt(addressCounter, 8);
+                char data = (char) character;
                 region.put(address, data);
-            }
 
+                endAddress = address;
+                addressCounter = Integer.toOctalString(Integer.parseInt(addressCounter, 8) + 1);
+            }
+                
             br.close();
-            LOGGER.info("Finished reading ROM file " + file.getName());
+            // System.out.println("Hello Debug Paragraph #1");
+            // for (Map.Entry<Character,Character> entry : region.entrySet())  {
+            //     System.out.println("Key = " + entry.getKey() + 
+            //                     ", Value = " + entry.getValue()); 
+            // }
+            LOGGER.info("Finished reading paragraph file " + file.getName());
+
 
         } catch (IOException e) {
             LOGGER.warning("Failed to read ROM file " + file.getName() + ": " + e.getMessage());
@@ -58,4 +66,5 @@ public class ROM {
     public String getPath() {
         return file.getAbsolutePath();
     }
+
 }

@@ -20,7 +20,7 @@ public class DeviceRegisterPanel extends CachePanel {
         super();
         setLayout(new GridBagLayout());
 
-        paragraphContent = new CacheTextField("Paragraph Content",10);
+        paragraphContent = new CacheTextField("Paragraph Content",6);
 
         deviceOutput = new CacheTextField("Device Output", 2);
 
