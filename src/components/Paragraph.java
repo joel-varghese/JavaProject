@@ -46,11 +46,7 @@ public class Paragraph {
             }
                 
             br.close();
-            // System.out.println("Hello Debug Paragraph #1");
-            // for (Map.Entry<Character,Character> entry : region.entrySet())  {
-            //     System.out.println("Key = " + entry.getKey() + 
-            //                     ", Value = " + entry.getValue()); 
-            // }
+            
             LOGGER.info("Finished reading paragraph file " + file.getName());
 
 

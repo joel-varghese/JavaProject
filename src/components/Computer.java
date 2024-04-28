@@ -141,46 +141,78 @@ public class Computer {
 
     public String fetchParagraphContent() {
         StringBuilder content = new StringBuilder();
-        char memoryCounter = Paragraph.startAddress;
+        char address = Paragraph.startAddress;
+        String addressCounter = Integer.toOctalString(address);
 
-        while (memoryCounter <= Paragraph.endAddress) {
-            content.append(memory.read(memoryCounter));
-            memoryCounter++;
+        while (address <= Paragraph.endAddress) {
+            content.append(memory.read(address));
+            //address++;
+            addressCounter = Integer.toOctalString(Integer.parseInt(addressCounter, 8) + 1);
+            address =  (char) Integer.parseInt(addressCounter, 8);
         }
 
         return content.toString();
     }
 
     public String searchUserWord(String userWord) {
-        StringBuilder content = new StringBuilder();
+        String result;
         StringBuilder memoryWord = new StringBuilder();
-        char memoryCounter = Paragraph.startAddress;
-        int wordIndex = 0;
-        boolean found = false;
+        char address = Paragraph.startAddress;
+        String addressCounter = Integer.toOctalString(address);
+        int sentenceNumber = 1; 
+        int wordNumber = 1;     // word number in the sentence
 
-        while (memoryCounter <= Paragraph.endAddress && !found) {
+        boolean found = false;
+        boolean isAWord = false;
+
+        while (address <= Paragraph.endAddress && !found) {
+
+            if(memory.read(address) == (char) '.') {
+                sentenceNumber++;
+                wordNumber = 0;
+            }
+
+            if(memory.read(address) == (char) ' ') {
+                wordNumber++;
+            }
             
-            if (memory.read(memoryCounter) == userWord.charAt(wordIndex)) {
+            if (memory.read(address) == userWord.charAt(0)) {
+                String tempAddressCounter = addressCounter;
+                char tempAddress = address;
+
+                String tempAddressCounterMinus1 = Integer.toOctalString(Integer.parseInt(tempAddressCounter, 8) - 1);
+                char tempAddressMinus1 =  (char) Integer.parseInt(tempAddressCounterMinus1, 8);
+
+                isAWord = memory.read(tempAddressMinus1) == (char) ' ' || tempAddressMinus1 < Paragraph.startAddress;
+
                 for (int i = 0; i < userWord.length(); i++) {
-                    memoryWord.append(memory.read(memoryCounter));
-                    memoryCounter++;
+                    memoryWord.append(memory.read(tempAddress));
+                    // memoryCounter++;
+                    tempAddressCounter = Integer.toOctalString(Integer.parseInt(tempAddressCounter, 8) + 1);
+                    tempAddress =  (char) Integer.parseInt(tempAddressCounter, 8);
+                }
+
+                isAWord = isAWord && (memory.read(tempAddress) == (char) ' ' || memory.read(tempAddress) == (char) '.');
+                if (userWord.equals(memoryWord.toString()) && isAWord) {
+                    found = true;
+                    break;
+                } else {                
+                    memoryWord = new StringBuilder();
                 }
             }
 
-            if (userWord.equals(memoryWord.toString())) {
-                found = true;
-            } else {
-                memoryWord = new StringBuilder();
-            }
+            isAWord = false;
 
-            memoryCounter++;
+            addressCounter = Integer.toOctalString(Integer.parseInt(addressCounter, 8) + 1);
+            address =  (char) Integer.parseInt(addressCounter, 8);
+            
         }
 
         if (found) {
-            return "It's in the Memory";
+           result = "User Word: " + userWord + "\nSentence #: " + sentenceNumber + "\nWord #: " + wordNumber;
         } else {
-            return "It's NOT in the Memory";
+            result = "Word NOT found!";
         }
-
+        return result;
     }
 }
